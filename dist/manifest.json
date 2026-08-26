@@ -9,6 +9,14 @@
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
+        "version": "10.11.11.2",
+        "checksum": "2b68563ad98fafbcf4eee9de6b21a6c4",
+        "changelog": "Исправлена деградация загрузки изображений при сбоях DNS/сети в контейнере: ретраи при временных ошибках сети и возврат исходного URL вместо отбрасывания изображения (по логам сервера: SocketException EAGAIN на st.kp.yandex.net)",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.2/jellyfin-plugin-kinopoisk_10.11.11.2.zip",
+        "timestamp": "2026-08-26T11:26:05Z"
+      },
+      {
         "version": "10.11.11.1",
         "checksum": "aaf3f3ab198de9a9cea4a891865ad72b",
         "changelog": "Исправлена загрузка постеров: устойчивость к редиректам антибота КиноПоиска, запасной вариант через preview-постер, ошибки API (лимит квоты) больше не ломают провайдер изображений целиком",
