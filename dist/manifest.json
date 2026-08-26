@@ -5,16 +5,16 @@
     "name": "КиноПоиск",
     "overview": "Информация о фильмах и сериалах с КиноПоиска",
     "owner": "bibibi-Matrix",
-    "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Поддерживаются два алгоритма доступа: kinopoiskapiunofficial.tech (по умолчанию) и kinopoisk.dev. Может потребоваться зарегистрировать свой ApiToken, см. информацию в параметрах плагина.",
+    "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Поддерживаются два алгоритма доступа: kinopoiskapiunofficial.tech (по умолчанию) и kinopoisk.dev.",
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
-        "version": "10.11.11.10",
+        "version": "10.11.11.1",
         "checksum": "",
-        "changelog": "Fix kinopoisk.dev season limit 1000 to 250 (API max)",
+        "changelog": "Fix kinopoisk.dev season limit, SeasonMetadataProvider, full card enrichment, pluggable backend",
         "targetAbi": "10.11.0",
-        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.10/jellyfin-plugin-kinopoisk_10.11.11.10.zip",
-        "timestamp": "2026-08-26T18:30:00Z"
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.1/jellyfin-plugin-kinopoisk_10.11.11.1.zip",
+        "timestamp": "2026-08-26T19:00:00Z"
       }
     ]
   }
