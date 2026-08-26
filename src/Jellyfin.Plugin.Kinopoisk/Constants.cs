@@ -13,10 +13,5 @@ namespace Jellyfin.Plugin.Kinopoisk
         public const string ProviderId = "kinopoisk";
         public const string ProviderName = "КиноПоиск";
         public const string ProviderMetadataLanguage = "ru";
-
-        /// <summary>
-        /// Name of the http client that does not follow redirects (used for image url validation).
-        /// </summary>
-        public const string NoRedirectHttpClient = "KinopoiskNoRedirect";
     }
 }

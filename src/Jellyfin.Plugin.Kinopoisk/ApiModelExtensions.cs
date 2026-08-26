@@ -123,9 +123,6 @@ namespace Jellyfin.Plugin.Kinopoisk
                 dst.CommunityRating = null;
             dst.CriticRating = src.GetCriticRatingAsTenPointBased();
 
-            if (src.FilmLength > 0)
-                dst.RunTimeTicks = TimeSpan.FromMinutes(src.FilmLength).Ticks;
-
             if (!string.IsNullOrWhiteSpace(src.ImdbId))
                 dst.SetProviderId(MetadataProvider.Imdb, src.ImdbId);
         }
@@ -289,44 +286,14 @@ namespace Jellyfin.Plugin.Kinopoisk
         }
 
         public static DateTime? ParseDate(this string src){
-            if (string.IsNullOrWhiteSpace(src) || string.Equals(src, "null", StringComparison.OrdinalIgnoreCase))
+            if (src == null)
                 return null;
 
             if (DateTime.TryParseExact(src, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var res))
                 return res;
 
-            if (DateTime.TryParseExact(src, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var resDateOnly))
-                return resDateOnly;
-
             return null;
         }
-
-        public static IEnumerable<RemoteImageInfo> ToRemoteImageInfos(this FilmImagesResponse src)
-        {
-            var res = Enumerable.Empty<RemoteImageInfo>();
-            if (src?.Items is null)
-                return res;
-
-            return src.Items
-                .Where(i => !string.IsNullOrWhiteSpace(i?.ImageUrl))
-                .Select(i => new RemoteImageInfo(){
-                    Type = ImageType.Backdrop,
-                    Url = i.ImageUrl,
-                    Language = Constants.ProviderMetadataLanguage,
-                    ProviderName = Constants.ProviderName
-                });
-        }
-
-        public static string GetLocalName(this global::KinopoiskUnofficialInfo.ApiClient.Episode src)
-        {
-            var res = src?.NameRu;
-            if (string.IsNullOrWhiteSpace(res))
-                res = src?.NameEn;
-            return res;
-        }
-
-        public static string GetOverview(this global::KinopoiskUnofficialInfo.ApiClient.Episode src)
-            => string.IsNullOrWhiteSpace(src?.Synopsis) ? null : src.Synopsis;
 
         public static DateTime? GetPremiereDate(this Film src)
         {

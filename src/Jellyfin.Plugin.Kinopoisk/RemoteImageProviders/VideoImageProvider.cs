@@ -49,23 +49,7 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
             var film = await _apiClient.GetSingleFilm(kinopoiskId, cancellationToken);
 
-            var images = film.ToRemoteImageInfos();
-
-            var enableBackdrops = Plugin.Instance?.Configuration.EnableBackdrops ?? true;
-            if (enableBackdrops)
-            {
-                try
-                {
-                    var stills = await _apiClient.GetImages(kinopoiskId, cancellationToken);
-                    images = images.Concat(stills.ToRemoteImageInfos());
-                }
-                catch (Exception e)
-                {
-                    _logger.LogWarning(e, "Failed to fetch backdrops for film {KinopoiskId}", kinopoiskId);
-                }
-            }
-
-            return await FilterEmptyImages(images);
+            return await FilterEmptyImages(film.ToRemoteImageInfos());
         }
     }
 }
