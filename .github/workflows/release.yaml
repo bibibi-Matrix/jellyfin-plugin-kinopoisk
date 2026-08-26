@@ -3,6 +3,9 @@ name: Release
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   DIST_ARCHIVES_PATH: dist/kinopoisk
   MANIFEST_FILE: dist/manifest.json
