@@ -9,6 +9,14 @@
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
+        "version": "10.11.11.9",
+        "checksum": "a90be1230ec839e9b13ccfcc5bc3d023",
+        "changelog": "- Добавлен SeasonMetadataProvider — описание и название сезона от КиноПоиска\n- Добавлен постер сезона (фоллбэк на постер сериала)\n- КиноПоиск добавлен в Season TypeOptions (MetadataFetchers + ImageFetchers)",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.9/jellyfin-plugin-kinopoisk_10.11.11.9.zip",
+        "timestamp": "2026-08-26T14:38:01Z"
+      },
+      {
         "version": "10.11.11.8",
         "checksum": "b3a79b6de0c5b86fa09b2cb3e36c118e",
         "changelog": "- Миниатюры эпизодов из данных КиноПоиска (алгоритм KinopoiskDev)\n- Логотип и обложка фильма в галерее изображений (алгоритм Unofficial, поля logoUrl/coverUrl)\n- Скриншоты как Thumb-превью (KinopoiskDev)\n- Статус сериала из поля источника (ongoing/completed) с приоритетом над эвристикой по датам\n- Премьера: приоритет российской даты над мировой\n- Студии-производители в карточке (KinopoiskDev)",
