@@ -1,5 +1,9 @@
 # Changelog
 
+## [10.11.11.10]
+
+- Fix kinopoisk.dev season limit 1000 → 250 (API max)
+
 ## [10.11.11.9]
 
 - Добавлен SeasonMetadataProvider — описание и название сезона от КиноПоиска
