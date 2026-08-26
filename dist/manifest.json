@@ -9,6 +9,14 @@
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
+        "version": "10.11.11.0",
+        "checksum": "4cd0725e7b23112197afa4e1e2101f8a",
+        "changelog": "Совместимость с Jellyfin 10.11.* (сборка против SDK 10.11.11)",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.0/jellyfin-plugin-kinopoisk_10.11.11.0.zip",
+        "timestamp": "2026-08-26T10:09:23Z"
+      },
+      {
         "version": "10.10.3.0",
         "checksum": "de4cf02e03339d61933a6869bf6be6f4",
         "changelog": "Исправлена совместимость с 10.10.*",
