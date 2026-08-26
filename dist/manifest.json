@@ -11,18 +11,10 @@
       {
         "version": "10.11.11.7",
         "checksum": "7329d08d1187deeb5733fbf21fd9c155",
-        "changelog": "Исправлены эндпоинты алгоритма KinopoiskDev по актуальной спецификации API: поиск (/v1.4/movie/search), сезоны с эпизодами (/v1.4/season), галерея изображений (/v1.4/image, до 250 шт.)",
+        "changelog": "Исправлены эндпоинты алгоритма KinopoiskDev по актуальной спецификации: поиск, сезоны с эпизодами, галерея изображений (до 250 шт.)",
         "targetAbi": "10.11",
         "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.7/jellyfin-plugin-kinopoisk_10.11.11.7.zip",
-        "timestamp": "2026-08-26T13:20:10Z"
-      },
-      {
-        "version": "10.11.11.6",
-        "checksum": "2f5097a331e4558312734c722bdf96e2",
-        "changelog": "Выбор алгоритма доступа к КиноПоиску в настройках; новый алгоритм KinopoiskDev (kinopoisk.dev) с более полной базой изображений",
-        "targetAbi": "10.11",
-        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.6/jellyfin-plugin-kinopoisk_10.11.11.6.zip",
-        "timestamp": "2026-08-26T14:20:00Z"
+        "timestamp": "2026-08-26T15:10:00Z"
       }
     ]
   }
