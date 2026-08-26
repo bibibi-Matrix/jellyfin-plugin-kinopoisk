@@ -19,7 +19,7 @@ namespace Jellyfin.Plugin.Kinopoisk.Model
 
         public bool Supports(IHasProviderIds item)
         {
-            return item is Movie || item is Series || item is Person;
+            return item is Movie || item is Series || item is Season || item is Episode || item is Person;
         }
     }
 }

@@ -22,8 +22,12 @@ namespace Jellyfin.Plugin.Kinopoisk
             if (src is null)
                 return null;
 
+            var name = src.GetLocalName();
+            if (src.Year > 1900)
+                name = $"{name} ({src.Year})";
+
             var res = new RemoteSearchResult() {
-                Name = src.GetLocalName(),
+                Name = name,
                 ImageUrl = src.PosterUrl,
                 PremiereDate = src.GetPremiereDate(),
                 Overview = src.Description,
@@ -50,8 +54,13 @@ namespace Jellyfin.Plugin.Kinopoisk
                 if (src is null)
                     return null;
 
+                var year = GetFirstYear(src.Year);
+                var name = src.GetLocalName();
+                if (year.HasValue && year.Value > 1900)
+                    name = $"{name} ({year.Value})";
+
                 var res = new RemoteSearchResult() {
-                    Name = src.GetLocalName(),
+                    Name = name,
                     ImageUrl = src.PosterUrl,
                     PremiereDate = src.GetPremiereDate(),
                     Overview = src.Description,

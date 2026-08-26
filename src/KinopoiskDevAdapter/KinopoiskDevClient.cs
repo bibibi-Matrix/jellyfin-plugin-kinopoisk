@@ -160,7 +160,8 @@ namespace KinopoiskDevAdapter
                     Description = Str(doc, "shortDescription"),
                     FilmLength = (Num(doc, "movieLength") ?? 0).ToString(CultureInfo.InvariantCulture),
                     PosterUrl = Str(Nested(doc, "poster"), "url"),
-                    PosterUrlPreview = Str(Nested(doc, "poster"), "previewUrl")
+                    PosterUrlPreview = Str(Nested(doc, "poster"), "previewUrl"),
+                    Type = ParseSearchType(Str(doc, "type"))
                 };
                 res.Films.Add(film);
             }
@@ -440,6 +441,24 @@ namespace KinopoiskDevAdapter
             foreach (var item in source)
                 return item;
             return default;
+        }
+
+        private static global::KinopoiskUnofficialInfo.ApiClient.FilmSearchResponse_filmsType ParseSearchType(string typeStr)
+        {
+            if (string.IsNullOrWhiteSpace(typeStr))
+                return global::KinopoiskUnofficialInfo.ApiClient.FilmSearchResponse_filmsType.UNKNOWN;
+
+            if (typeStr.Contains("series", StringComparison.OrdinalIgnoreCase)
+                || typeStr.Contains("tv-series", StringComparison.OrdinalIgnoreCase)
+                || typeStr.Equals("tv-show", StringComparison.OrdinalIgnoreCase)
+                || typeStr.Equals("miniseries", StringComparison.OrdinalIgnoreCase))
+                return global::KinopoiskUnofficialInfo.ApiClient.FilmSearchResponse_filmsType.TV_SHOW;
+
+            if (typeStr.Equals("film", StringComparison.OrdinalIgnoreCase)
+                || typeStr.Equals("movie", StringComparison.OrdinalIgnoreCase))
+                return global::KinopoiskUnofficialInfo.ApiClient.FilmSearchResponse_filmsType.FILM;
+
+            return global::KinopoiskUnofficialInfo.ApiClient.FilmSearchResponse_filmsType.UNKNOWN;
         }
 
         private static global::KinopoiskUnofficialInfo.ApiClient.StaffResponseProfessionKey ToProfessionKey(string enProfession)
