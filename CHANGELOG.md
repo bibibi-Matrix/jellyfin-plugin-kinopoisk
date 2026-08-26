@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## [10.11.11.4]
+
+- Fix NullReferenceException in RegisterServices (Plugin.Instance not yet available at DI time)
+- Fix: log backend swap errors instead of silently swallowing
+- Remove redundant lock in SwitchableKinopoiskClient (volatile handles it)
+- Fix typo in configPage.html (kinopoist → kinopoisk)
+
 ## [10.11.11.3]
 
 - Backend can now be switched without server restart (live swap on config save)

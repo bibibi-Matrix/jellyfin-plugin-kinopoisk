@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <DebugType>portable</DebugType>
-    <Version>10.11.11.3</Version>
+    <Version>10.11.11.4</Version>
   </PropertyGroup>
 
   <ItemGroup>

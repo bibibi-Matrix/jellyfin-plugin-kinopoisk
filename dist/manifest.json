@@ -9,11 +9,11 @@
         "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
         "versions": [
             {
-                "version": "10.11.11.3",
-                "changelog": "Backend can now be switched without server restart",
+                "version": "10.11.11.4",
+                "changelog": "Fix NullReferenceException in RegisterServices, log backend swap errors, remove redundant lock, fix typo",
                 "targetAbi": "10.11.0.0",
-                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.3/jellyfin-plugin-kinopoisk_10.11.11.3.zip",
-                "checksum": "7626c6f9787e81fafb29b86ad73d58fd",
+                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.4/jellyfin-plugin-kinopoisk_10.11.11.4.zip",
+                "checksum": "9a6d4bff579e5ee349e4ef89629a5c98",
                 "timestamp": "2026-08-26T21:30:00Z"
             }
         ]
