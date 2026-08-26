@@ -10,6 +10,14 @@
     "versions": [
       {
         "version": "10.11.11.9",
+        "checksum": "0b4dc918c01142595a5509771c192f56",
+        "changelog": "- Добавлен SeasonMetadataProvider — описание и название сезона от КиноПоиска\n- Добавлен постер сезона (фоллбэк на постер сериала)\n- КиноПоиск добавлен в Season TypeOptions (MetadataFetchers + ImageFetchers)",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.9/jellyfin-plugin-kinopoisk_10.11.11.9.zip",
+        "timestamp": "2026-08-26T15:46:05Z"
+      },
+      {
+        "version": "10.11.11.9",
         "checksum": "a90be1230ec839e9b13ccfcc5bc3d023",
         "changelog": "SeasonMetadataProvider - описание и название сезона от КиноПоиска\nПостер сезона (фоллбэк на постер сериала)\nКиноПоиск добавлен в Season TypeOptions",
         "targetAbi": "10.11.0",
