@@ -66,9 +66,10 @@ namespace Jellyfin.Plugin.Kinopoisk
 
                 sw.SwitchTo(newInner);
             }
-            catch
+            catch (Exception ex)
             {
-                // Old client continues to work
+                // Log but don't crash — old client continues to work
+                System.Diagnostics.Debug.WriteLine($"[Kinopoisk] Failed to swap backend: {ex.Message}");
             }
         }
     }

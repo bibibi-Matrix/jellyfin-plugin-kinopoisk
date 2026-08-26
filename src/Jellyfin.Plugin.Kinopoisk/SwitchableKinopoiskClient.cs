@@ -13,7 +13,6 @@ namespace Jellyfin.Plugin.Kinopoisk
     /// </summary>
     public class SwitchableKinopoiskClient : IKinopoiskApiClient
     {
-        private readonly object _lock = new();
         private volatile IKinopoiskApiClient _inner;
         private readonly ILogger<SwitchableKinopoiskClient> _logger;
 
@@ -27,12 +26,9 @@ namespace Jellyfin.Plugin.Kinopoisk
 
         public void SwitchTo(IKinopoiskApiClient newClient)
         {
-            lock (_lock)
-            {
-                _logger.LogInformation("Switching kinopoisk backend from {OldType} to {NewType}",
-                    _inner.GetType().Name, newClient.GetType().Name);
-                _inner = newClient;
-            }
+            _logger.LogInformation("Switching kinopoisk backend from {OldType} to {NewType}",
+                _inner.GetType().Name, newClient.GetType().Name);
+            _inner = newClient;
         }
 
         public Task<PersonResponse> GetPerson(int personId, CancellationToken? cancellationToken = null)

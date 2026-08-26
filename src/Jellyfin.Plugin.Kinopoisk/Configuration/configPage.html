@@ -45,7 +45,7 @@
                 pluginUniqueId: '33e6d249-648f-44cd-a9ce-497be06c08df'
             };
 
-            function kinopoistToggleTokenRows(backend) {
+            function kinopoiskToggleTokenRows(backend) {
                 var isDev = backend === 'KinopoiskDev';
                 document.getElementById('rowUnofficialToken').style.display = isDev ? 'none' : '';
                 document.getElementById('rowDevToken').style.display = isDev ? '' : 'none';
@@ -57,13 +57,13 @@
                     $('#Backend').val(config.Backend || 'KinopoiskApiUnofficial').change();
                     $('#ApiToken').val(config.ApiToken).change();
                     $('#ApiDevToken').val(config.ApiDevToken || '').change();
-                    kinopoistToggleTokenRows($('#Backend').val());
+                    kinopoiskToggleTokenRows($('#Backend').val());
                     Dashboard.hideLoadingMsg();
                 });
             });
 
             $('#Backend').on('change', function () {
-                kinopoistToggleTokenRows($(this).val());
+                kinopoiskToggleTokenRows($(this).val());
             });
 
             $('#KinopoiskConfigForm').on('submit', function () {
