@@ -31,6 +31,11 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
         protected abstract TItemType ConvertResponseToItem(Film apiResponse);
 
+        /// <summary>
+        /// Type filter: prevents assigning movie metadata to a series and vice versa.
+        /// </summary>
+        protected virtual bool Accepts(Film apiResponse) => true;
+
         public async Task<MetadataResult<TItemType>> GetMetadata(TLookupInfoType info, CancellationToken cancellationToken)
         {
             var result = new MetadataResult<TItemType>()
@@ -47,6 +52,9 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
             var film = await _apiClient.GetSingleFilm(kinopoiskId, cancellationToken);
 
             cancellationToken.ThrowIfCancellationRequested();
+
+            if (!Accepts(film))
+                return result;
 
             result.Item = ConvertResponseToItem(film);
             if (result.Item != null)

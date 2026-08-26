@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using KinopoiskUnofficialInfo.ApiClient;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -105,16 +106,25 @@ namespace Jellyfin.Plugin.Kinopoisk
                 dst.ProductionYear = src.Year;
             if (!string.IsNullOrWhiteSpace(src.Slogan))
                 dst.Tagline = src.Slogan;
-            dst.Overview = src.Description;
+            dst.Overview = CoalesceNonEmpty(src.Description, src.ShortDescription, StripHtml);
             if (src.Countries != null)
                 dst.ProductionLocations = src.Countries.Select(c => c.Country1).ToArray();
             if (src.Genres != null)
                 foreach(var genre in src.Genres.Select(c => c.Genre1))
                     dst.AddGenre(genre);
-            if (!string.IsNullOrEmpty(src.RatingAgeLimits))
-                dst.OfficialRating = $"{src.RatingAgeLimits}+";
+
+            // Age rating: api returns either "16"/"age16" or mpaa like "r"
+            if (!string.IsNullOrWhiteSpace(src.RatingAgeLimits))
+            {
+                var age = src.RatingAgeLimits.Trim();
+                if (age.StartsWith("age", StringComparison.OrdinalIgnoreCase))
+                    age = age.Substring(3);
+                dst.OfficialRating = $"{age}+";
+            }
+            else if (!string.IsNullOrWhiteSpace(src.RatingMpaa))
+                dst.OfficialRating = src.RatingMpaa.Trim().ToUpperInvariant();
             else
-                dst.OfficialRating = src.RatingMpaa;
+                dst.OfficialRating = null;
 
             dst.CommunityRating = (float)src.RatingKinopoisk;
             if (dst.CommunityRating < 0.1)
@@ -123,8 +133,43 @@ namespace Jellyfin.Plugin.Kinopoisk
                 dst.CommunityRating = null;
             dst.CriticRating = src.GetCriticRatingAsTenPointBased();
 
+            var runtimeMinutes = ParseFilmLengthToMinutes(src.FilmLength);
+            if (runtimeMinutes > 0)
+                dst.RunTimeTicks = TimeSpan.FromMinutes(runtimeMinutes.Value).Ticks;
+
             if (!string.IsNullOrWhiteSpace(src.ImdbId))
                 dst.SetProviderId(MetadataProvider.Imdb, src.ImdbId);
+        }
+
+        private static string CoalesceNonEmpty(string first, string second, Func<string, string> transform = null)
+        {
+            var value = !string.IsNullOrWhiteSpace(first) ? first : second;
+            return string.IsNullOrWhiteSpace(value) ? null : (transform?.Invoke(value) ?? value);
+        }
+
+        private static string StripHtml(string src)
+            => string.IsNullOrWhiteSpace(src) ? src : Regex.Replace(src, "<[^>]+>", string.Empty).Trim();
+
+        /// <summary>
+        /// Parses film length returned by the api: "HH:mm", "mm" or empty.
+        /// </summary>
+        public static int? ParseFilmLengthToMinutes(this string src)
+        {
+            if (string.IsNullOrWhiteSpace(src))
+                return null;
+
+            src = src.Trim();
+
+            var parts = src.Split(':');
+            if (parts.Length == 2
+                && int.TryParse(parts[0], out var hours)
+                && int.TryParse(parts[1], out var minutes))
+                return hours * 60 + minutes;
+
+            if (int.TryParse(src, out var total))
+                return total;
+
+            return null;
         }
 
         public static float? GetCriticRatingAsTenPointBased(this Film src)

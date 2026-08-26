@@ -16,5 +16,21 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
         protected override Movie ConvertResponseToItem(Film apiResponse)
             => apiResponse.ToMovie();
+
+        protected override bool Accepts(Film apiResponse)
+            => apiResponse.IsFilmLike();
+    }
+
+    internal static class FilmTypeExtensions
+    {
+        public static bool IsFilmLike(this Film film)
+            => film is null
+                || film.Type == KinopoiskUnofficialInfo.ApiClient.FilmType.FILM
+                || film.Type == KinopoiskUnofficialInfo.ApiClient.FilmType.VIDEO
+                || film.ShortFilm;
+
+        public static bool IsSeriesLike(this Film film)
+            => film is null
+                || !film.IsFilmLike();
     }
 }

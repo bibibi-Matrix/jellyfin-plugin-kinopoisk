@@ -2340,7 +2340,7 @@ namespace KinopoiskUnofficialInfo.ApiClient
         public int Year { get; set; }
     
         [Newtonsoft.Json.JsonProperty("filmLength", Required = Newtonsoft.Json.Required.Always)]
-        public int FilmLength { get; set; }
+        public string FilmLength { get; set; } // PATCHED: api returns "HH:mm" string, not int
     
         [Newtonsoft.Json.JsonProperty("slogan", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]

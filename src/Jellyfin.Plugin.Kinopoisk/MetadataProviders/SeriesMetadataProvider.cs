@@ -16,5 +16,8 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
         protected override Series ConvertResponseToItem(Film apiResponse)
             => apiResponse.ToSeries();
+
+        protected override bool Accepts(Film apiResponse)
+            => apiResponse.IsSeriesLike();
     }
 }
