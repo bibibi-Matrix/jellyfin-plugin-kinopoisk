@@ -141,7 +141,7 @@ namespace KinopoiskDevAdapter
         {
             var ct = cancellationToken ?? CancellationToken.None;
             var query = Uri.EscapeDataString(keyword ?? string.Empty);
-            var root = (await GetJsonAsync($"/v1.1/movie/search?query={query}&limit=10&page={Math.Max(1, page)}", ct).ConfigureAwait(false)).RootElement;
+            var root = (await GetJsonAsync($"/v1.4/movie/search?query={query}&limit=10&page={Math.Max(1, page)}", ct).ConfigureAwait(false)).RootElement;
 
             var res = new global::KinopoiskUnofficialInfo.ApiClient.FilmSearchResponse
             {
@@ -237,37 +237,41 @@ namespace KinopoiskDevAdapter
         public async Task<global::KinopoiskUnofficialInfo.ApiClient.SeasonResponse> GetSeasons(int filmId, CancellationToken? cancellationToken = null)
         {
             var ct = cancellationToken ?? CancellationToken.None;
-            var root = (await GetJsonAsync($"/v1.4/episode?movieId={filmId}&notNullField=airDate&limit=1000", ct).ConfigureAwait(false)).RootElement;
+            var root = (await GetJsonAsync($"/v1.4/season?movieId={filmId}&limit=1000", ct).ConfigureAwait(false)).RootElement;
 
-            var seasons = new Dictionary<int, global::KinopoiskUnofficialInfo.ApiClient.Season>();
-            foreach (var ep in Arr(root, "docs"))
+            var seasons = new SortedDictionary<int, global::KinopoiskUnofficialInfo.ApiClient.Season>();
+            foreach (var seasonDoc in Arr(root, "docs"))
             {
-                var seasonNumber = Num(ep, "seasonNumber") ?? 0;
+                var seasonNumber = Num(seasonDoc, "number") ?? 0;
                 if (seasonNumber < 1)
                     continue;
 
-                if (!seasons.TryGetValue(seasonNumber, out var season))
-                {
-                    season = new global::KinopoiskUnofficialInfo.ApiClient.Season { Number = seasonNumber, Episodes = new Collection<global::KinopoiskUnofficialInfo.ApiClient.Episode>() };
-                    seasons[seasonNumber] = season;
-                }
+                var season = new global::KinopoiskUnofficialInfo.ApiClient.Season { Number = seasonNumber, Episodes = new Collection<global::KinopoiskUnofficialInfo.ApiClient.Episode>() };
+                seasons[seasonNumber] = season;
 
-                season.Episodes.Add(new global::KinopoiskUnofficialInfo.ApiClient.Episode
+                foreach (var ep in Arr(seasonDoc, "episodes"))
                 {
-                    SeasonNumber = seasonNumber,
-                    EpisodeNumber = Num(ep, "episodeNumber") ?? 0,
-                    NameRu = Str(ep, "name"),
-                    NameEn = Str(ep, "enName"),
-                    Synopsis = Str(ep, "description"),
-                    ReleaseDate = Date10(Str(ep, "airDate")) ?? string.Empty
-                });
+                    var episodeNumber = Num(ep, "number") ?? 0;
+                    if (episodeNumber < 1)
+                        continue;
+
+                    season.Episodes.Add(new global::KinopoiskUnofficialInfo.ApiClient.Episode
+                    {
+                        SeasonNumber = seasonNumber,
+                        EpisodeNumber = episodeNumber,
+                        NameRu = Str(ep, "name"),
+                        NameEn = Str(ep, "enName"),
+                        Synopsis = Str(ep, "description"),
+                        ReleaseDate = Date10(Str(ep, "airDate")) ?? string.Empty
+                    });
+                }
             }
 
             var seasonList = new System.Collections.Generic.List<global::KinopoiskUnofficialInfo.ApiClient.Season>();
             foreach (var key in seasons.Keys)
                 seasonList.Add(seasons[key]);
 
-            return new global::KinopoiskUnofficialInfo.ApiClient.SeasonResponse { Items = new Collection<global::KinopoiskUnofficialInfo.ApiClient.Season>(seasonList), Total = seasons.Count };
+            return new global::KinopoiskUnofficialInfo.ApiClient.SeasonResponse { Items = new Collection<global::KinopoiskUnofficialInfo.ApiClient.Season>(seasonList), Total = seasonList.Count };
         }
 
         public Task<global::KinopoiskUnofficialInfo.ApiClient.FactResponse> GetFacts(int filmId, CancellationToken? cancellationToken = null)
@@ -278,10 +282,11 @@ namespace KinopoiskDevAdapter
 
         public async Task<global::KinopoiskUnofficialInfo.ApiClient.FilmImagesResponse> GetImages(int filmId, CancellationToken? cancellationToken = null)
         {
-            var root = await GetMovieRoot(filmId, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+            var ct = cancellationToken ?? CancellationToken.None;
+            var root = (await GetJsonAsync($"/v1.4/image?movieId={filmId}&limit=250", ct).ConfigureAwait(false)).RootElement;
             var res = new global::KinopoiskUnofficialInfo.ApiClient.FilmImagesResponse();
 
-            foreach (var b in Arr(root, "backdrops"))
+            foreach (var b in Arr(root, "docs"))
             {
                 var url = Str(b, "url");
                 if (!string.IsNullOrWhiteSpace(url))
