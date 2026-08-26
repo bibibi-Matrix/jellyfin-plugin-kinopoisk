@@ -637,5 +637,15 @@ namespace Jellyfin.Plugin.Kinopoisk
                 res = src?.NameEn;
             return res;
         }
+
+        public static string GetLocalSeasonName(this global::KinopoiskUnofficialInfo.ApiClient.Season src, int seasonNumber)
+        {
+            var res = src?.NameRu;
+            if (string.IsNullOrWhiteSpace(res))
+                res = src?.NameEn;
+            if (string.IsNullOrWhiteSpace(res))
+                res = $"Сезон {seasonNumber}";
+            return res;
+        }
     }
 }

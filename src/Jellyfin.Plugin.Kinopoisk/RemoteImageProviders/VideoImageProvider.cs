@@ -32,11 +32,13 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
         }
 
         public override bool Supports(BaseItem item)
-            => item is Movie || item is Series || item is global::MediaBrowser.Controller.Entities.TV.Episode;
+            => item is Movie || item is Series || item is global::MediaBrowser.Controller.Entities.TV.Season || item is global::MediaBrowser.Controller.Entities.TV.Episode;
 
         public override IEnumerable<ImageType> GetSupportedImages(BaseItem item)
         {
             if (item is global::MediaBrowser.Controller.Entities.TV.Episode)
+                yield return ImageType.Primary;
+            else if (item is global::MediaBrowser.Controller.Entities.TV.Season)
                 yield return ImageType.Primary;
             else
             {
@@ -50,10 +52,35 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
         public override async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, CancellationToken cancellationToken)
         {
+            if (item is global::MediaBrowser.Controller.Entities.TV.Season season)
+                return await GetSeasonImages(season, cancellationToken);
+
             if (item is global::MediaBrowser.Controller.Entities.TV.Episode episode)
                 return await GetEpisodeImages(episode, cancellationToken);
 
             return await GetVideoImages(item, cancellationToken);
+        }
+
+        /// <summary>
+        /// Season poster — falls back to the series poster since kinopoisk.dev has no season-specific images.
+        /// </summary>
+        private async Task<IEnumerable<RemoteImageInfo>> GetSeasonImages(global::MediaBrowser.Controller.Entities.TV.Season season, CancellationToken cancellationToken)
+        {
+            var seriesKpIdStr = season?.Series?.GetProviderId(Constants.ProviderId);
+            if (string.IsNullOrWhiteSpace(seriesKpIdStr) || !int.TryParse(seriesKpIdStr, out var seriesKpId))
+                return Enumerable.Empty<RemoteImageInfo>();
+
+            try
+            {
+                var film = await _apiClient.GetSingleFilm(seriesKpId, cancellationToken);
+                var posters = film.ToRemoteImageInfos().Where(i => i.Type == ImageType.Primary);
+                return await FilterEmptyImages(posters);
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug(e, "Failed to fetch film poster for season {KinopoiskId}", seriesKpId);
+                return Enumerable.Empty<RemoteImageInfo>();
+            }
         }
 
         private async Task<IEnumerable<RemoteImageInfo>> GetVideoImages(BaseItem item, CancellationToken cancellationToken)

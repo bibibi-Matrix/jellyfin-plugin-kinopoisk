@@ -14,6 +14,15 @@ namespace KinopoiskUnofficialInfo.ApiClient
         public string StatusString { get; set; }
     }
 
+    public partial class Season
+    {
+        public string NameRu { get; set; }
+
+        public string NameEn { get; set; }
+
+        public string AirDate { get; set; }
+    }
+
     public partial class Episode
     {
         /// <summary>

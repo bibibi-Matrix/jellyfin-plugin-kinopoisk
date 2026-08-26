@@ -249,7 +249,14 @@ namespace KinopoiskDevAdapter
                 if (seasonNumber < 1)
                     continue;
 
-                var season = new global::KinopoiskUnofficialInfo.ApiClient.Season { Number = seasonNumber, Episodes = new Collection<global::KinopoiskUnofficialInfo.ApiClient.Episode>() };
+                var season = new global::KinopoiskUnofficialInfo.ApiClient.Season
+                {
+                    Number = seasonNumber,
+                    Episodes = new Collection<global::KinopoiskUnofficialInfo.ApiClient.Episode>(),
+                    NameRu = Str(seasonDoc, "name"),
+                    NameEn = Str(seasonDoc, "enName"),
+                    AirDate = Date10(Str(seasonDoc, "airDate"))
+                };
                 seasons[seasonNumber] = season;
 
                 foreach (var ep in Arr(seasonDoc, "episodes"))

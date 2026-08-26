@@ -1,5 +1,11 @@
 # Changelog
 
+## [10.11.11.9]
+
+- Добавлен SeasonMetadataProvider — описание и название сезона от КиноПоиска
+- Добавлен постер сезона (фоллбэк на постер сериала)
+- КиноПоиск добавлен в Season TypeOptions (MetadataFetchers + ImageFetchers)
+
 ## [10.11.11.8]
 
 - Миниатюры эпизодов из данных КиноПоиска (алгоритм KinopoiskDev)
