@@ -13,17 +13,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.Kinopoisk
 {
-    /// <summary>
-    /// Registers services
-    /// </summary>
     public class KinopoiskPluginServiceRegistrator : IPluginServiceRegistrator
     {
+        /// <summary>
+        /// Static references for Plugin to access after registration.
+        /// Plugin.Instance is not yet set when RegisterServices is called.
+        /// </summary>
+        internal static SwitchableKinopoiskClient SwitchableClient { get; private set; }
+        internal static IServerApplicationHost ApplicationHost { get; private set; }
+
         public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
         {
+            ApplicationHost = applicationHost;
             var configuration = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
-
-            // Store application host so Plugin can recreate client on config change
-            Plugin.Instance.ApplicationHost = applicationHost;
 
             serviceCollection.AddSingleton<SwitchableKinopoiskClient>((sp) =>
             {
@@ -32,7 +34,7 @@ namespace Jellyfin.Plugin.Kinopoisk
                     sp.GetRequiredService<IMemoryCache>(),
                     sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>());
                 var sw = new SwitchableKinopoiskClient(inner, sp.GetRequiredService<ILogger<SwitchableKinopoiskClient>>());
-                Plugin.Instance.SwitchableClient = sw;
+                SwitchableClient = sw;
                 return sw;
             });
             serviceCollection.AddSingleton<IKinopoiskApiClient>(sp => sp.GetRequiredService<SwitchableKinopoiskClient>());
@@ -43,10 +45,6 @@ namespace Jellyfin.Plugin.Kinopoisk
             serviceCollection.AddSingleton<IProviderIdResolver<BaseItem>, CommonResolver<BaseItem>>();
         }
 
-        /// <summary>
-        /// Creates the appropriate raw API client (not wrapped in cache/switchable).
-        /// Public so Plugin can call it on config change.
-        /// </summary>
         public static IKinopoiskApiClient CreateRawClient(IServiceProvider sp, Configuration.PluginConfiguration configuration)
         {
             if (string.Equals(configuration.Backend, "KinopoiskDev", StringComparison.OrdinalIgnoreCase))
@@ -57,7 +55,6 @@ namespace Jellyfin.Plugin.Kinopoisk
                     sp.GetRequiredService<IHttpClientFactory>());
             }
 
-            // Default algorithm: kinopoiskapiunofficial.tech
             return new KinopoiskApiClient(
                 configuration.ApiToken,
                 sp.GetRequiredService<ILogger<KinopoiskApiClient>>(),
