@@ -4,7 +4,9 @@ Fetches metadata from https://www.kinopoisk.ru/. This site is popular in the Rus
 
 ## Установка
 
-Администрирование - Панель - Расширенное - Плагины - вкладка Репозитории - добавить адрес https://raw.githubusercontent.com/LinFor/jellyfin-plugin-kinopoisk/master/dist/manifest.json.
+Администрирование - Панель - Расширенное - Плагины - вкладка Репозитории - добавить адрес https://raw.githubusercontent.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/master/dist/manifest.json.
+
+Плагин собран под Jellyfin 10.11.* (форк [LinFor/jellyfin-plugin-kinopoisk](https://github.com/LinFor/jellyfin-plugin-kinopoisk), обновлён до SDK 10.11.11).
 
 После этого на вкладке Каталог найти "КиноПоиск" (раздел Метаданные) и установить.
 
