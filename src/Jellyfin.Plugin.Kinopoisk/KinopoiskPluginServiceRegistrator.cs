@@ -22,11 +22,20 @@ namespace Jellyfin.Plugin.Kinopoisk
         {
             var configuration = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
-            serviceCollection.AddSingleton<IKinopoiskApiClient>((sp) => new CachedKinopoiskApiClient(
-                CreateRawClient(sp, configuration),
-                sp.GetRequiredService<IMemoryCache>(),
-                sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>()
-            ));
+            // Store application host so Plugin can recreate client on config change
+            Plugin.Instance.ApplicationHost = applicationHost;
+
+            serviceCollection.AddSingleton<SwitchableKinopoiskClient>((sp) =>
+            {
+                var inner = new CachedKinopoiskApiClient(
+                    CreateRawClient(sp, configuration),
+                    sp.GetRequiredService<IMemoryCache>(),
+                    sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>());
+                var sw = new SwitchableKinopoiskClient(inner, sp.GetRequiredService<ILogger<SwitchableKinopoiskClient>>());
+                Plugin.Instance.SwitchableClient = sw;
+                return sw;
+            });
+            serviceCollection.AddSingleton<IKinopoiskApiClient>(sp => sp.GetRequiredService<SwitchableKinopoiskClient>());
 
             serviceCollection.AddSingleton<IProviderIdResolver<MovieInfo>, VideoResolver<MovieInfo>>();
             serviceCollection.AddSingleton<IProviderIdResolver<SeriesInfo>, VideoResolver<SeriesInfo>>();
@@ -34,7 +43,11 @@ namespace Jellyfin.Plugin.Kinopoisk
             serviceCollection.AddSingleton<IProviderIdResolver<BaseItem>, CommonResolver<BaseItem>>();
         }
 
-        private static IKinopoiskApiClient CreateRawClient(IServiceProvider sp, Configuration.PluginConfiguration configuration)
+        /// <summary>
+        /// Creates the appropriate raw API client (not wrapped in cache/switchable).
+        /// Public so Plugin can call it on config change.
+        /// </summary>
+        public static IKinopoiskApiClient CreateRawClient(IServiceProvider sp, Configuration.PluginConfiguration configuration)
         {
             if (string.Equals(configuration.Backend, "KinopoiskDev", StringComparison.OrdinalIgnoreCase))
             {

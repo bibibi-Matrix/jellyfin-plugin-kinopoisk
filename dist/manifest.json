@@ -9,12 +9,12 @@
         "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
         "versions": [
             {
-                "version": "10.11.11.2",
-                "changelog": "Search results show year, type filtering for duplicates, year+type combined resolver",
+                "version": "10.11.11.3",
+                "changelog": "Backend can now be switched without server restart",
                 "targetAbi": "10.11.0.0",
-                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.2/jellyfin-plugin-kinopoisk_10.11.11.2.zip",
-                "checksum": "2656ff8b957f9fb69d30cc27d6529b17",
-                "timestamp": "2026-08-26T19:52:08Z"
+                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.3/jellyfin-plugin-kinopoisk_10.11.11.3.zip",
+                "checksum": "7626c6f9787e81fafb29b86ad73d58fd",
+                "timestamp": "2026-08-26T21:30:00Z"
             }
         ]
     }

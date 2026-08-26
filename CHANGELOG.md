@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## [10.11.11.3]
+
+- Backend can now be switched without server restart (live swap on config save)
+
 ## [10.11.11.2]
 
 - Search results now show year for better disambiguation (e.g. "Чудо-доктор (2026)")
