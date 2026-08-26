@@ -182,6 +182,22 @@ namespace Jellyfin.Plugin.Kinopoisk
             return res;
         }
 
+        public static IEnumerable<RemoteImageInfo> ToRemoteImageInfos(this FilmImagesResponse src)
+        {
+            var res = Enumerable.Empty<RemoteImageInfo>();
+            if (src?.Items is null)
+                return res;
+
+            return src.Items
+                .Where(i => !string.IsNullOrWhiteSpace(i?.ImageUrl))
+                .Select(i => new RemoteImageInfo(){
+                    Type = ImageType.Backdrop,
+                    Url = i.ImageUrl,
+                    Language = Constants.ProviderMetadataLanguage,
+                    ProviderName = Constants.ProviderName
+                });
+        }
+
         // public static IEnumerable<RemoteImageInfo> ToRemoteImageInfos(this IEnumerable<Images_posters> src, ImageType imageType)
         // {
         //     return src.Select(s => s.ToRemoteImageInfo(imageType))

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,8 @@ namespace KinopoiskUnofficialInfo.ApiClient
 {
     public class KinopoiskApiClient : IKinopoiskApiClient
     {
+        private const string BaseUrl = "https://kinopoiskapiunofficial.tech";
+
         private readonly string _apiToken;
         private readonly ILogger<KinopoiskApiClient> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -72,5 +75,29 @@ namespace KinopoiskUnofficialInfo.ApiClient
                 }
             }, cancellationToken);
         }
+
+        public async Task<FilmImagesResponse> GetImages(int filmId, CancellationToken? cancellationToken = null)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+            httpClient.DefaultRequestHeaders.Add("X-API-KEY", _apiToken);
+
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/api/v2.2/films/{filmId}/images?type=STILL&page=1");
+                using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+                using var stream = await response.Content.ReadAsStreamAsync(cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                return await JsonSerializer.DeserializeAsync<FilmImagesResponse>(stream, JsonOpts, cancellationToken ?? CancellationToken.None).ConfigureAwait(false)
+                    ?? new FilmImagesResponse();
+            }
+            catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
+            {
+                _logger.LogError($"Images request for film {filmId} failed: {e.Message}");
+                return new FilmImagesResponse();
+            }
+        }
+
+        private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web);
     }
 }

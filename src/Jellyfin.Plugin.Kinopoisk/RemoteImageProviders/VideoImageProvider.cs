@@ -58,7 +58,19 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
                 return Enumerable.Empty<RemoteImageInfo>();
             }
 
-            return await FilterEmptyImages(film.ToRemoteImageInfos());
+            var images = film.ToRemoteImageInfos();
+
+            try
+            {
+                var stills = await _apiClient.GetImages(kinopoiskId, cancellationToken);
+                images = images.Concat(stills.ToRemoteImageInfos());
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, "Failed to fetch stills for film {KinopoiskId}", kinopoiskId);
+            }
+
+            return await FilterEmptyImages(images);
         }
     }
 }
