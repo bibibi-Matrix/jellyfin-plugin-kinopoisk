@@ -5,24 +5,16 @@
     "name": "КиноПоиск",
     "overview": "Информация о фильмах и сериалах с КиноПоиска",
     "owner": "bibibi-Matrix",
-    "description": "Загружает рейтинг, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Может потребоваться зарегистрировать свой ApiToken, см. информацию в параметрах плагина. Для точного распознавания рекомендуется указывать id фильма с сайта КиноПоиск в имени файла в формате kp-12345 или kp12345. Подробнее см. https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/blob/master/README.md\n",
+    "description": "Загружает рейтинг, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Поддерживаются два алгоритма доступа: kinopoiskapiunofficial.tech (по умолчанию) и kinopoisk.dev. Может потребоваться зарегистрировать свой ApiToken, см. информацию в параметрах плагина. Для точного распознавания рекомендуется указывать id фильма с сайта КиноПоиск в имени файла в формате kp-12345 или kp12345. Подробнее см. https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/blob/master/README.md\n",
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
         "version": "10.11.11.6",
         "checksum": "2f5097a331e4558312734c722bdf96e2",
-        "changelog": "- Выбор алгоритма доступа к КиноПоиску в настройках плагина\n- Новый алгоритм KinopoiskDev (kinopoisk.dev): постеры, баннеры, люди, трейлеры, эпизоды и премьеры через единый бесплатный токен\n- Настройка: переключение бэкенда + отдельный токен для каждого алгоритма",
+        "changelog": "Выбор алгоритма доступа к КиноПоиску в настройках; новый алгоритм KinopoiskDev (kinopoisk.dev) с более полной базой изображений",
         "targetAbi": "10.11",
         "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.6/jellyfin-plugin-kinopoisk_10.11.11.6.zip",
-        "timestamp": "2026-08-26T12:58:07Z"
-      },
-      {
-        "version": "10.11.11.5",
-        "checksum": "2457ed46cd9f906cb2dc779a160a1b9a",
-        "changelog": "Полная карточка: точная дата премьеры из дистрибуции, статус сериала и метаданные эпизодов по датам эфира, интересные факты в описании, кадры в галерее изображений",
-        "targetAbi": "10.11",
-        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.5/jellyfin-plugin-kinopoisk_10.11.11.5.zip",
-        "timestamp": "2026-08-26T13:25:00Z"
+        "timestamp": "2026-08-26T14:20:00Z"
       }
     ]
   }
