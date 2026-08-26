@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -17,8 +18,8 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
         where TItemType : BaseItem, IHasLookupInfo<TLookupInfoType>
         where TLookupInfoType : ItemLookupInfo, new()
     {
-        private readonly ILogger _logger;
-        private readonly IKinopoiskApiClient _apiClient;
+        protected readonly ILogger _logger;
+        protected readonly IKinopoiskApiClient _apiClient;
         private readonly IProviderIdResolver<TLookupInfoType> _providerIdResolver;
 
         public BaseVideoMetadataProvider(IKinopoiskApiClient kinopoiskApiClient, IProviderIdResolver<TLookupInfoType> providerIdResolver, ILogger logger, IHttpClientFactory httpClientFactory)
@@ -35,6 +36,12 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
         /// Type filter: prevents assigning movie metadata to a series and vice versa.
         /// </summary>
         protected virtual bool Accepts(Film apiResponse) => true;
+
+        /// <summary>
+        /// Additional per-type enrichment (extra api calls).
+        /// </summary>
+        protected virtual Task PostProcessAsync(TItemType item, int kinopoiskId, CancellationToken cancellationToken)
+            => Task.CompletedTask;
 
         public async Task<MetadataResult<TItemType>> GetMetadata(TLookupInfoType info, CancellationToken cancellationToken)
         {
@@ -74,7 +81,45 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
             if (remoteTrailers is not null)
                 result.Item.RemoteTrailers = remoteTrailers;
 
+            await EnrichCardAsync(result.Item, kinopoiskId, cancellationToken);
+            await PostProcessAsync(result.Item, kinopoiskId, cancellationToken);
+
             return result;
+        }
+
+        private async Task EnrichCardAsync(TItemType item, int kinopoiskId, CancellationToken cancellationToken)
+        {
+            if (item is null)
+                return;
+
+            // Precise premiere date from distributions
+            try
+            {
+                var distributions = await _apiClient.GetDistributions(kinopoiskId, cancellationToken);
+                var premiereDate = distributions.SelectPremiereDate();
+                if (premiereDate.HasValue)
+                    item.PremiereDate = premiereDate;
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug(e, "Distributions fetch failed for {KinopoiskId}", kinopoiskId);
+            }
+
+            // Interesting facts appended to the overview
+            try
+            {
+                var facts = await _apiClient.GetFacts(kinopoiskId, cancellationToken);
+                var factLines = facts.CollectFactLines();
+                if (factLines.Count > 0)
+                {
+                    var overview = item.Overview?.TrimEnd() ?? string.Empty;
+                    item.Overview = overview + (overview.Length > 0 ? "\n\n" : string.Empty) + string.Join("\n", factLines);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug(e, "Facts fetch failed for {KinopoiskId}", kinopoiskId);
+            }
         }
 
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(TLookupInfoType searchInfo, CancellationToken cancellationToken)

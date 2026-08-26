@@ -70,6 +70,16 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
                 _logger.LogWarning(e, "Failed to fetch stills for film {KinopoiskId}", kinopoiskId);
             }
 
+            try
+            {
+                var frames = await _apiClient.GetFrames(kinopoiskId, cancellationToken);
+                images = images.Concat(frames.ToRemoteImageInfos());
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug(e, "Failed to fetch frames for film {KinopoiskId}", kinopoiskId);
+            }
+
             return await FilterEmptyImages(images);
         }
     }

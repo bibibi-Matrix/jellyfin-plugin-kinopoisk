@@ -98,6 +98,29 @@ namespace KinopoiskUnofficialInfo.ApiClient
             }
         }
 
+        public Task<SeasonResponse> GetSeasons(int filmId, CancellationToken? cancellationToken = null)
+        {
+            return Invoke(async (ct) => {
+                try {
+                    return await _apiClient.SeasonsAsync(filmId, ct);
+                } catch (ApiException e)
+                {
+                    if (e.StatusCode == 404)
+                        return new SeasonResponse();
+                    throw;
+                }
+            }, cancellationToken);
+        }
+
+        public Task<FactResponse> GetFacts(int filmId, CancellationToken? cancellationToken = null)
+            => Invoke((ct) => _apiClient.FactsAsync(filmId, ct), cancellationToken);
+
+        public Task<FilmFrameResponse> GetFrames(int filmId, CancellationToken? cancellationToken = null)
+            => Invoke((ct) => _apiClient.FramesAsync(filmId, ct), cancellationToken);
+
+        public Task<DistributionResponse> GetDistributions(int filmId, CancellationToken? cancellationToken = null)
+            => Invoke((ct) => _apiClient.DistributionsAsync(filmId, ct), cancellationToken);
+
         private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web);
     }
 }

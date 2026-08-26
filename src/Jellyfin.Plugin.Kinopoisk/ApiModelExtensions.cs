@@ -172,6 +172,17 @@ namespace Jellyfin.Plugin.Kinopoisk
             return null;
         }
 
+        public static string GetLocalName(this global::KinopoiskUnofficialInfo.ApiClient.Episode src)
+        {
+            var res = src?.NameRu;
+            if (string.IsNullOrWhiteSpace(res))
+                res = src?.NameEn;
+            return res;
+        }
+
+        public static string GetOverview(this global::KinopoiskUnofficialInfo.ApiClient.Episode src)
+            => string.IsNullOrWhiteSpace(src?.Synopsis) ? null : StripHtml(src.Synopsis);
+
         public static float? GetCriticRatingAsTenPointBased(this Film src)
         {
             if (src is null)
@@ -241,6 +252,76 @@ namespace Jellyfin.Plugin.Kinopoisk
                     Language = Constants.ProviderMetadataLanguage,
                     ProviderName = Constants.ProviderName
                 });
+        }
+
+        public static IEnumerable<RemoteImageInfo> ToRemoteImageInfos(this FilmFrameResponse src)
+        {
+            var res = Enumerable.Empty<RemoteImageInfo>();
+            if (src?.Frames is null)
+                return res;
+
+            return src.Frames
+                .Where(f => !string.IsNullOrWhiteSpace(f?.Image))
+                .Select(f => new RemoteImageInfo(){
+                    Type = ImageType.Backdrop,
+                    Url = f.Image,
+                    Language = Constants.ProviderMetadataLanguage,
+                    ProviderName = Constants.ProviderName
+                });
+        }
+
+        /// <summary>
+        /// Picks the earliest premiere date from distributions, preferring world premieres.
+        /// </summary>
+        public static DateTime? SelectPremiereDate(this DistributionResponse src)
+        {
+            if (src?.Items is null || src.Items.Count < 1)
+                return null;
+
+            var dates = src.Items
+                .Where(d => d?.Date != null)
+                .Select(d => new { d.Type, Parsed = d.Date.ParseDate() })
+                .Where(d => d.Parsed.HasValue)
+                .ToList();
+
+            if (dates.Count < 1)
+                return null;
+
+            var premiere = dates.FirstOrDefault(d =>
+                d.Type == KinopoiskUnofficialInfo.ApiClient.DistributionType.WORLD_PREMIER
+                || d.Type == KinopoiskUnofficialInfo.ApiClient.DistributionType.PREMIERE);
+
+            return (premiere ?? dates.OrderBy(d => d.Parsed.Value).First()).Parsed;
+        }
+
+        /// <summary>
+        /// Returns up to maxCount non-spoiler facts formatted as list lines.
+        /// </summary>
+        public static IList<string> CollectFactLines(this FactResponse src, int maxCount = 3)
+        {
+            var res = new List<string>();
+            if (src?.Items is null || src.Items.Count < 1)
+                return res;
+
+            foreach (var fact in src.Items)
+            {
+                if (res.Count >= maxCount)
+                    break;
+                if (fact?.Spoiler == true || string.IsNullOrWhiteSpace(fact?.Text))
+                    continue;
+
+                var text = StripHtml(fact.Text);
+                if (!string.IsNullOrWhiteSpace(text))
+                    res.AppendLine("• " + text);
+            }
+
+            return res;
+        }
+
+        private static IList<string> AppendLine(this IList<string> list, string line)
+        {
+            list.Add(line);
+            return list;
         }
 
         // public static IEnumerable<RemoteImageInfo> ToRemoteImageInfos(this IEnumerable<Images_posters> src, ImageType imageType)
