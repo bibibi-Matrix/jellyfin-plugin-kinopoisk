@@ -1,11 +1,11 @@
-[
+﻿[
   {
     "category": "Metadata",
     "guid": "33e6d249-648f-44cd-a9ce-497be06c08df",
     "name": "КиноПоиск",
     "overview": "Информация о фильмах и сериалах с КиноПоиска",
     "owner": "bibibi-Matrix",
-    "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Поддерживаются два алгоритма доступа: kinopoiskapiunofficial.tech (по умолчанию) и kinopoisk.dev.",
+    "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск.",
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
