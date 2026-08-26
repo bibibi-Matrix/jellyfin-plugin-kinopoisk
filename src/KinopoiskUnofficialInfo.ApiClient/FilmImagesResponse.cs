@@ -14,5 +14,10 @@ namespace KinopoiskUnofficialInfo.ApiClient
         public string ImageUrl { get; set; }
 
         public string ImagePreviewUrl { get; set; }
+
+        /// <summary>
+        /// Source image kind: still/backdrops/frame/promo/screenshot/shooting/wallpaper/logo/cover.
+        /// </summary>
+        public string Kind { get; set; }
     }
 }

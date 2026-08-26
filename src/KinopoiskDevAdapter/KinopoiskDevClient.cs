@@ -215,20 +215,23 @@ namespace KinopoiskDevAdapter
             var videos = Nested(root, "videos");
             var res = new global::KinopoiskUnofficialInfo.ApiClient.VideoResponse { Items = new Collection<global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_items>() };
 
-            foreach (var t in Arr(videos, "trailers"))
+            foreach (var trailerSource in new[] { "trailers", "teasers" })
             {
-                var url = Str(t, "url");
-                if (string.IsNullOrWhiteSpace(url))
-                    continue;
-
-                res.Items.Add(new global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_items
+                foreach (var t in Arr(videos, trailerSource))
                 {
-                    Url = url,
-                    Name = Str(t, "name"),
-                    Site = string.Equals(Str(t, "site"), "youtube", StringComparison.OrdinalIgnoreCase)
-                        ? global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_itemsSite.YOUTUBE
-                        : global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_itemsSite.UNKNOWN
-                });
+                    var url = Str(t, "url");
+                    if (string.IsNullOrWhiteSpace(url))
+                        continue;
+
+                    res.Items.Add(new global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_items
+                    {
+                        Url = url,
+                        Name = string.IsNullOrWhiteSpace(Str(t, "name")) ? trailerSource : $"{trailerSource}: {Str(t, "name")}",
+                        Site = string.Equals(Str(t, "site"), "youtube", StringComparison.OrdinalIgnoreCase)
+                            ? global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_itemsSite.YOUTUBE
+                            : global::KinopoiskUnofficialInfo.ApiClient.VideoResponse_itemsSite.UNKNOWN
+                    });
+                }
             }
 
             return res;
@@ -262,7 +265,8 @@ namespace KinopoiskDevAdapter
                         NameRu = Str(ep, "name"),
                         NameEn = Str(ep, "enName"),
                         Synopsis = Str(ep, "description"),
-                        ReleaseDate = Date10(Str(ep, "airDate")) ?? string.Empty
+                        ReleaseDate = Date10(Str(ep, "airDate")) ?? string.Empty,
+                        StillUrl = Str(Nested(ep, "still"), "url")
                     });
                 }
             }
@@ -290,7 +294,7 @@ namespace KinopoiskDevAdapter
             {
                 var url = Str(b, "url");
                 if (!string.IsNullOrWhiteSpace(url))
-                    res.Items.Add(new global::KinopoiskUnofficialInfo.ApiClient.FilmImage { ImageUrl = url, ImagePreviewUrl = Str(b, "previewUrl") });
+                    res.Items.Add(new global::KinopoiskUnofficialInfo.ApiClient.FilmImage { ImageUrl = url, ImagePreviewUrl = Str(b, "previewUrl"), Kind = Str(b, "type") });
             }
 
             res.Total = res.Items.Count;
@@ -301,8 +305,19 @@ namespace KinopoiskDevAdapter
         {
             var root = await GetMovieRoot(filmId, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
             var premiere = Nested(root, "premiere");
-            var worldDate = Date10(Str(premiere, "world"));
             var res = new global::KinopoiskUnofficialInfo.ApiClient.DistributionResponse();
+
+            var russiaDate = Date10(Str(premiere, "russia"));
+            var worldDate = Date10(Str(premiere, "world"));
+
+            if (!string.IsNullOrWhiteSpace(russiaDate))
+            {
+                res.Items.Add(new global::KinopoiskUnofficialInfo.ApiClient.Distribution
+                {
+                    Type = global::KinopoiskUnofficialInfo.ApiClient.DistributionType.COUNTRY_SPECIFIC,
+                    Date = russiaDate
+                });
+            }
 
             if (!string.IsNullOrWhiteSpace(worldDate))
             {
@@ -377,6 +392,14 @@ namespace KinopoiskDevAdapter
                 typeStr.Equals("tv-show", StringComparison.OrdinalIgnoreCase) ? global::KinopoiskUnofficialInfo.ApiClient.FilmType.TV_SHOW :
                 global::KinopoiskUnofficialInfo.ApiClient.FilmType.FILM;
             film.Serial = film.Type == global::KinopoiskUnofficialInfo.ApiClient.FilmType.TV_SERIES;
+            film.StatusString = Str(root, "status");
+
+            foreach (var s in Arr(root, "studios"))
+            {
+                var studioName = Str(s, "name");
+                if (!string.IsNullOrWhiteSpace(studioName))
+                    film.Studios.Add(studioName);
+            }
 
             var releaseYears = First(Arr(root, "releaseYears"));
             if (!releaseYears.Equals(default))

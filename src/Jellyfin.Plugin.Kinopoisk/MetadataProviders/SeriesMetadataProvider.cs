@@ -26,12 +26,19 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
             => apiResponse.IsSeriesLike();
 
         /// <summary>
-        /// Derives series status and dates from episode air dates.
+        /// Derives series status and dates from the status field and episode air dates.
         /// </summary>
-        protected override async Task PostProcessAsync(Series item, int kinopoiskId, CancellationToken cancellationToken)
+        protected override async Task PostProcessAsync(Series item, Film film, int kinopoiskId, CancellationToken cancellationToken)
         {
             if (item is null)
                 return;
+
+            // Status from the source field when available
+            var statusStr = film?.StatusString;
+            if (string.Equals(statusStr, "completed", StringComparison.OrdinalIgnoreCase))
+                item.Status = SeriesStatus.Ended;
+            else if (string.Equals(statusStr, "ongoing", StringComparison.OrdinalIgnoreCase))
+                item.Status = SeriesStatus.Continuing;
 
             try
             {
@@ -53,9 +60,12 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
                     item.PremiereDate = first;
 
                 item.EndDate = last;
-                item.Status = last > DateTime.UtcNow.AddDays(-45)
-                    ? SeriesStatus.Continuing
-                    : SeriesStatus.Ended;
+
+                // Date-based fallback when the status field was empty
+                if (item.Status != SeriesStatus.Ended || string.IsNullOrWhiteSpace(statusStr))
+                    item.Status = last > DateTime.UtcNow.AddDays(-45)
+                        ? SeriesStatus.Continuing
+                        : SeriesStatus.Ended;
             }
             catch (Exception e)
             {

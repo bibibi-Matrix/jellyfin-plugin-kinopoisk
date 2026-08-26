@@ -112,6 +112,10 @@ namespace Jellyfin.Plugin.Kinopoisk
             if (src.Genres != null)
                 foreach(var genre in src.Genres.Select(c => c.Genre1))
                     dst.AddGenre(genre);
+            if (src.Studios != null)
+                foreach(var studio in src.Studios)
+                    if (!string.IsNullOrWhiteSpace(studio))
+                        dst.AddStudio(studio);
 
             // Age rating: api returns either "16"/"age16" or mpaa like "r"
             if (!string.IsNullOrWhiteSpace(src.RatingAgeLimits))
@@ -247,11 +251,22 @@ namespace Jellyfin.Plugin.Kinopoisk
             return src.Items
                 .Where(i => !string.IsNullOrWhiteSpace(i?.ImageUrl))
                 .Select(i => new RemoteImageInfo(){
-                    Type = ImageType.Backdrop,
+                    Type = MapImageKind(i.Kind),
                     Url = i.ImageUrl,
                     Language = Constants.ProviderMetadataLanguage,
                     ProviderName = Constants.ProviderName
                 });
+        }
+
+        private static ImageType MapImageKind(string kind)
+        {
+            if (string.Equals(kind, "logo", StringComparison.OrdinalIgnoreCase))
+                return ImageType.Logo;
+            if (string.Equals(kind, "cover", StringComparison.OrdinalIgnoreCase))
+                return ImageType.Banner;
+            if (string.Equals(kind, "screenshot", StringComparison.OrdinalIgnoreCase))
+                return ImageType.Thumb;
+            return ImageType.Backdrop;
         }
 
         public static IEnumerable<RemoteImageInfo> ToRemoteImageInfos(this FilmFrameResponse src)
@@ -271,7 +286,7 @@ namespace Jellyfin.Plugin.Kinopoisk
         }
 
         /// <summary>
-        /// Picks the earliest premiere date from distributions, preferring world premieres.
+        /// Picks a premiere date: russia-specific first, then world premieres, then earliest known date.
         /// </summary>
         public static DateTime? SelectPremiereDate(this DistributionResponse src)
         {
@@ -280,12 +295,20 @@ namespace Jellyfin.Plugin.Kinopoisk
 
             var dates = src.Items
                 .Where(d => d?.Date != null)
-                .Select(d => new { d.Type, Parsed = d.Date.ParseDate() })
+                .Select(d => new { d.Type, d.Country, Parsed = d.Date.ParseDate() })
                 .Where(d => d.Parsed.HasValue)
                 .ToList();
 
             if (dates.Count < 1)
                 return null;
+
+            // Russia-specific distribution first
+            var russian = dates.FirstOrDefault(d =>
+                string.Equals(d.Type.ToString(), "COUNTRY_SPECIFIC", StringComparison.OrdinalIgnoreCase)
+                || (d.Country?.Country1?.Contains("Россия", StringComparison.OrdinalIgnoreCase) ?? false));
+
+            if (russian != null)
+                return russian.Parsed;
 
             var premiere = dates.FirstOrDefault(d =>
                 d.Type == KinopoiskUnofficialInfo.ApiClient.DistributionType.WORLD_PREMIER

@@ -40,7 +40,7 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
         /// <summary>
         /// Additional per-type enrichment (extra api calls).
         /// </summary>
-        protected virtual Task PostProcessAsync(TItemType item, int kinopoiskId, CancellationToken cancellationToken)
+        protected virtual Task PostProcessAsync(TItemType item, Film film, int kinopoiskId, CancellationToken cancellationToken)
             => Task.CompletedTask;
 
         public async Task<MetadataResult<TItemType>> GetMetadata(TLookupInfoType info, CancellationToken cancellationToken)
@@ -82,7 +82,7 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
                 result.Item.RemoteTrailers = remoteTrailers;
 
             await EnrichCardAsync(result.Item, kinopoiskId, cancellationToken);
-            await PostProcessAsync(result.Item, kinopoiskId, cancellationToken);
+            await PostProcessAsync(result.Item, film, kinopoiskId, cancellationToken);
 
             return result;
         }

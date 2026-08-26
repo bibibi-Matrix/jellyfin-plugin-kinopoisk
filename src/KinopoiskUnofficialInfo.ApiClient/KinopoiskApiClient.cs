@@ -78,23 +78,63 @@ namespace KinopoiskUnofficialInfo.ApiClient
 
         public async Task<FilmImagesResponse> GetImages(int filmId, CancellationToken? cancellationToken = null)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.Timeout = TimeSpan.FromSeconds(30);
-            httpClient.DefaultRequestHeaders.Add("X-API-KEY", _apiToken);
+            var res = new FilmImagesResponse();
 
+            // Gallery images (stills etc.)
             try
             {
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(30);
+                httpClient.DefaultRequestHeaders.Add("X-API-KEY", _apiToken);
+
                 using var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/api/v2.2/films/{filmId}/images?type=STILL&page=1");
                 using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
                 using var stream = await response.Content.ReadAsStreamAsync(cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
-                return await JsonSerializer.DeserializeAsync<FilmImagesResponse>(stream, JsonOpts, cancellationToken ?? CancellationToken.None).ConfigureAwait(false)
-                    ?? new FilmImagesResponse();
+                var parsed = await JsonSerializer.DeserializeAsync<FilmImagesResponse>(stream, JsonOpts, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                if (parsed?.Items != null)
+                    foreach (var item in parsed.Items)
+                        res.Items.Add(item);
+                res.Total = res.Items.Count;
             }
             catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
             {
                 _logger.LogError($"Images request for film {filmId} failed: {e.Message}");
-                return new FilmImagesResponse();
+            }
+
+            // Logo and cover from film meta (v2.2 fields missing in the generated v2.1 model)
+            try
+            {
+                var httpClient2 = _httpClientFactory.CreateClient();
+                httpClient2.Timeout = TimeSpan.FromSeconds(30);
+                httpClient2.DefaultRequestHeaders.Add("X-API-KEY", _apiToken);
+
+                using var metaRequest = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/api/v2.2/films/{filmId}");
+                using var metaResponse = await httpClient2.SendAsync(metaRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                metaResponse.EnsureSuccessStatusCode();
+                using var metaStream = await metaResponse.Content.ReadAsStreamAsync(cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                using var doc = await JsonDocument.ParseAsync(metaStream, cancellationToken: cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+
+                AddIfPresent(res, doc.RootElement, "logoUrl", "logo");
+                AddIfPresent(res, doc.RootElement, "coverUrl", "cover");
+            }
+            catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
+            {
+                _logger.LogDebug($"Film meta request for film {filmId} failed: {e.Message}");
+            }
+
+            return res;
+        }
+
+        private void AddIfPresent(FilmImagesResponse res, JsonElement root, string fieldName, string kind)
+        {
+            if (root.ValueKind == JsonValueKind.Object
+                && root.TryGetProperty(fieldName, out var v)
+                && v.ValueKind == JsonValueKind.String
+                && !string.IsNullOrWhiteSpace(v.GetString()))
+            {
+                res.Items.Add(new FilmImage { ImageUrl = v.GetString(), Kind = kind });
+                res.Total = res.Items.Count;
             }
         }
 

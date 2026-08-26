@@ -32,16 +32,31 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
         }
 
         public override bool Supports(BaseItem item)
-            => item is Movie || item is Series;
+            => item is Movie || item is Series || item is global::MediaBrowser.Controller.Entities.TV.Episode;
 
         public override IEnumerable<ImageType> GetSupportedImages(BaseItem item)
-            => new ImageType[]
+        {
+            if (item is global::MediaBrowser.Controller.Entities.TV.Episode)
+                yield return ImageType.Primary;
+            else
             {
-                ImageType.Primary,
-                ImageType.Backdrop
-            };
+                yield return ImageType.Primary;
+                yield return ImageType.Backdrop;
+                yield return ImageType.Logo;
+                yield return ImageType.Banner;
+                yield return ImageType.Thumb;
+            }
+        }
 
         public override async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, CancellationToken cancellationToken)
+        {
+            if (item is global::MediaBrowser.Controller.Entities.TV.Episode episode)
+                return await GetEpisodeImages(episode, cancellationToken);
+
+            return await GetVideoImages(item, cancellationToken);
+        }
+
+        private async Task<IEnumerable<RemoteImageInfo>> GetVideoImages(BaseItem item, CancellationToken cancellationToken)
         {
             var (resolveResult, kinopoiskId) = await _providerIdResolver.TryResolve(item, cancellationToken);
             if (!resolveResult)
@@ -81,6 +96,52 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
             }
 
             return await FilterEmptyImages(images);
+        }
+
+        /// <summary>
+        /// Episode thumbnail from the series seasons data (kinopoisk.dev).
+        /// </summary>
+        private async Task<IEnumerable<RemoteImageInfo>> GetEpisodeImages(global::MediaBrowser.Controller.Entities.TV.Episode episode, CancellationToken cancellationToken)
+        {
+            var seriesKpIdStr = episode?.Series?.GetProviderId(Constants.ProviderId);
+            if (string.IsNullOrWhiteSpace(seriesKpIdStr) || !int.TryParse(seriesKpIdStr, out var seriesKpId))
+                return Enumerable.Empty<RemoteImageInfo>();
+
+            var seasonNumber = episode.ParentIndexNumber;
+            var episodeNumber = episode.IndexNumber;
+            if (seasonNumber is null or < 1 || episodeNumber is null or < 1)
+                return Enumerable.Empty<RemoteImageInfo>();
+
+            SeasonResponse seasons;
+            try
+            {
+                seasons = await _apiClient.GetSeasons(seriesKpId, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(e, "Failed to fetch seasons for series {KinopoiskId}", seriesKpId);
+                return Enumerable.Empty<RemoteImageInfo>();
+            }
+
+            var apiEpisode = seasons?.Items?
+                .FirstOrDefault(s => s?.Number == seasonNumber.Value)?
+                .Episodes?
+                .FirstOrDefault(e => e?.EpisodeNumber == episodeNumber.Value);
+
+            var stillUrl = apiEpisode?.StillUrl;
+            if (string.IsNullOrWhiteSpace(stillUrl))
+                return Enumerable.Empty<RemoteImageInfo>();
+
+            return await FilterEmptyImages(new[]
+            {
+                new RemoteImageInfo
+                {
+                    Type = ImageType.Primary,
+                    Url = stillUrl,
+                    Language = Constants.ProviderMetadataLanguage,
+                    ProviderName = Constants.ProviderName
+                }
+            });
         }
     }
 }
