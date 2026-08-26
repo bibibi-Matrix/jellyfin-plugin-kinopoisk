@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "category": "Metadata",
     "guid": "33e6d249-648f-44cd-a9ce-497be06c08df",
@@ -7,6 +7,15 @@
     "owner": "bibibi-Matrix",
     "description": "Загружает рейтинг, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Может потребоваться зарегистрировать свой ApiToken, см. информацию в параметрах плагина. Для точного распознавания рекомендуется указывать id фильма с сайта КиноПоиск в имени файла в формате kp-12345 или kp12345. Подробнее см. https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/blob/master/README.md\n",
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
-    "versions": []
+    "versions": [
+      {
+        "version": "10.11.11.1",
+        "checksum": "74b1d2105b5b1c23c11455156cee6d5d",
+        "changelog": "- Хронометраж фильма (Runtime)\n- Бэкдропы из галереи КиноПоиска\n- Метаданные эпизодов сериалов (названия, описания, даты)\n- Ограничение частоты запросов (rate limiting), настраивается\n- Настраиваемый таймаут запросов\n- Использован IHttpClientFactory для проверки URL картинок",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.1/jellyfin-plugin-kinopoisk_10.11.11.1.zip",
+        "timestamp": "2026-08-26T10:47:45Z"
+      }
+    ]
   }
 ]
