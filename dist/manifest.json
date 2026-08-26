@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "category": "Metadata",
     "guid": "33e6d249-648f-44cd-a9ce-497be06c08df",
@@ -8,6 +8,14 @@
     "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск.",
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
+      {
+        "version": "10.11.11.1",
+        "checksum": "eb92313714047b74371f396dcd9b003a",
+        "changelog": "- Fix kinopoisk.dev season limit 1000 → 250 (API max)\n- SeasonMetadataProvider: season name/description from KP\n- Season poster fallback to series poster\n- Full card: episode stills, logo/cover images, thumb screenshots, series status, RU premiere priority, studios\n- Fixed poster sanitizer, age rating prefix, runtime parsing\n- Pluggable backend: unofficial + kinopoisk.dev dropdown",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.1/jellyfin-plugin-kinopoisk_10.11.11.1.zip",
+        "timestamp": "2026-08-26T16:17:28Z"
+      },
       {
         "version": "10.11.11.1",
         "checksum": "",
