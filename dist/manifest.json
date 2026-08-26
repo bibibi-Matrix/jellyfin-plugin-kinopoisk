@@ -14,14 +14,6 @@
                          "timestamp":  "2026-08-26T19:52:08Z",
                          "targetAbi":  "10.11",
                          "sourceUrl":  "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.2/jellyfin-plugin-kinopoisk_10.11.11.2.zip"
-                     },
-                     {
-                         "version":  "10.11.11.1",
-                         "checksum":  "eb92313714047b74371f396dcd9b003a",
-                         "changelog":  "Fix kinopoisk.dev season limit 1000 to 250, SeasonMetadataProvider, full card enrichment, pluggable backend",
-                         "targetAbi":  "10.11",
-                         "sourceUrl":  "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.1/jellyfin-plugin-kinopoisk_10.11.11.1.zip",
-                         "timestamp":  "2026-08-26T16:17:28Z"
                      }
                  ]
 }
