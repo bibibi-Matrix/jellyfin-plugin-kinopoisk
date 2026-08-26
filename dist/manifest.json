@@ -9,6 +9,14 @@
     "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
     "versions": [
       {
+        "version": "10.11.11.4",
+        "checksum": "d74e06fb2af496b75ca5b10da9754c72",
+        "changelog": "- Возрастной рейтинг: убран лишний префикс age (age16+ -> 16+), MPAA приведён к верхнему регистру\n- Хронометраж: парсинг формата HH:mm, который возвращает API (раньше поле терялось)\n- Описание: если полного описания нет, используется краткое; HTML-теги вычищаются\n- Фильтр по типу контента: метаданные фильма не применяются к сериалу и наоборот (FILM/VIDEO против TV_SERIES/MINI_SERIES/TV_SHOW)",
+        "targetAbi": "10.11",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.4/jellyfin-plugin-kinopoisk_10.11.11.4.zip",
+        "timestamp": "2026-08-26T11:46:12Z"
+      },
+      {
         "version": "10.11.11.3",
         "checksum": "c53b6c53234a71882ba1833d953a7a20",
         "changelog": "Загрузка длинных баннеров (задников) из галереи КиноПоиска - до 20 кадров на фильм, прямые URL без редиректов",
