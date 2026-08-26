@@ -240,7 +240,7 @@ namespace KinopoiskDevAdapter
         public async Task<global::KinopoiskUnofficialInfo.ApiClient.SeasonResponse> GetSeasons(int filmId, CancellationToken? cancellationToken = null)
         {
             var ct = cancellationToken ?? CancellationToken.None;
-            var root = (await GetJsonAsync($"/v1.4/season?movieId={filmId}&limit=1000", ct).ConfigureAwait(false)).RootElement;
+            var root = (await GetJsonAsync($"/v1.4/season?movieId={filmId}&limit=250", ct).ConfigureAwait(false)).RootElement;
 
             var seasons = new SortedDictionary<int, global::KinopoiskUnofficialInfo.ApiClient.Season>();
             foreach (var seasonDoc in Arr(root, "docs"))
