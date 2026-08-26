@@ -18,16 +18,31 @@ namespace Jellyfin.Plugin.Kinopoisk
     {
         public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
         {
+            var configuration = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
+
+            serviceCollection.AddHttpClient(Constants.NoRedirectHttpClient)
+                .ConfigurePrimaryHttpMessageHandler(() => new System.Net.Http.HttpClientHandler { AllowAutoRedirect = false });
+
             serviceCollection.AddSingleton((sp) => new KinopoiskApiClient(
-                Plugin.Instance.Configuration.ApiToken,
+                configuration.ApiToken,
                 sp.GetRequiredService<ILogger<KinopoiskApiClient>>(),
-                sp.GetRequiredService<IHttpClientFactory>()
+                sp.GetRequiredService<IHttpClientFactory>(),
+                configuration.RequestTimeoutSeconds
             ));
-            serviceCollection.AddSingleton<IKinopoiskApiClient>((sp) => new CachedKinopoiskApiClient(
-                sp.GetRequiredService<KinopoiskApiClient>(),
-                sp.GetRequiredService<IMemoryCache>(),
-                sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>()
-            ));
+
+            // Cache first, then rate limiter: cache hits are not throttled.
+            serviceCollection.AddSingleton<IKinopoiskApiClient>((sp) => {
+                var cached = new CachedKinopoiskApiClient(
+                    sp.GetRequiredService<KinopoiskApiClient>(),
+                    sp.GetRequiredService<IMemoryCache>(),
+                    sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>()
+                );
+                return new RateLimitedKinopoiskApiClient(
+                    cached,
+                    configuration.MaxRequestsPerSecond,
+                    sp.GetRequiredService<ILogger<RateLimitedKinopoiskApiClient>>()
+                );
+            });
 
             serviceCollection.AddSingleton<IProviderIdResolver<MovieInfo>, VideoResolver<MovieInfo>>();
             serviceCollection.AddSingleton<IProviderIdResolver<SeriesInfo>, VideoResolver<SeriesInfo>>();

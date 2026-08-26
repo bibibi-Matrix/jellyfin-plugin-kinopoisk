@@ -85,7 +85,7 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
         protected async Task<IEnumerable<PersonInfo>> SanitizeEmptyImagePersonInfos(IEnumerable<PersonInfo> images)
         {
-            using var httpClient = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = false }, true);
+            using var httpClient = _httpClientFactory.CreateClient(Constants.NoRedirectHttpClient);
             var sanitizer = new RemoteImageUrlSanitizer(httpClient);
             var res = await Task.WhenAll(images.Select(async p => {
                 p.ImageUrl = await sanitizer.SanitizeRemoteImageUrl(p.ImageUrl);

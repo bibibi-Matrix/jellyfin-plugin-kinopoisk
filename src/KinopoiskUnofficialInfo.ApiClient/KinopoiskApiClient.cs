@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -10,12 +11,14 @@ namespace KinopoiskUnofficialInfo.ApiClient
 {
     public class KinopoiskApiClient : IKinopoiskApiClient
     {
+        private const string BaseUrl = "https://kinopoiskapiunofficial.tech";
+
         private readonly string _apiToken;
         private readonly ILogger<KinopoiskApiClient> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly Client _apiClient;
 
-        public KinopoiskApiClient(string apiToken, ILogger<KinopoiskApiClient> logger, IHttpClientFactory httpClientFactory)
+        public KinopoiskApiClient(string apiToken, ILogger<KinopoiskApiClient> logger, IHttpClientFactory httpClientFactory, int requestTimeoutSeconds = 30)
         {
             if (string.IsNullOrEmpty(apiToken))
             {
@@ -27,6 +30,7 @@ namespace KinopoiskUnofficialInfo.ApiClient
             _httpClientFactory = httpClientFactory ?? throw new System.ArgumentNullException(nameof(httpClientFactory));
 
             var httpClient = _httpClientFactory.CreateClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(requestTimeoutSeconds > 0 ? requestTimeoutSeconds : 30);
             httpClient.DefaultRequestHeaders.Add("X-API-KEY", _apiToken);
             _apiClient = new Client(httpClient);
         }
@@ -72,5 +76,43 @@ namespace KinopoiskUnofficialInfo.ApiClient
                 }
             }, cancellationToken);
         }
+
+        public Task<SeasonResponse> GetSeasons(int filmId, CancellationToken? cancellationToken = null)
+        {
+            return Invoke(async (ct) => {
+                try {
+                    return await _apiClient.SeasonsAsync(filmId, ct);
+                } catch (ApiException e)
+                {
+                    if (e.StatusCode == 404)
+                        return new SeasonResponse();
+                    throw;
+                }
+            }, cancellationToken);
+        }
+
+        public async Task<FilmImagesResponse> GetImages(int filmId, CancellationToken? cancellationToken = null)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+            httpClient.DefaultRequestHeaders.Add("X-API-KEY", _apiToken);
+
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/api/v2.2/films/{filmId}/images?type=STILL&page=1");
+                using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+                using var stream = await response.Content.ReadAsStreamAsync(cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
+                return await JsonSerializer.DeserializeAsync<FilmImagesResponse>(stream, JsonOpts, cancellationToken ?? CancellationToken.None).ConfigureAwait(false)
+                    ?? new FilmImagesResponse();
+            }
+            catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException)
+            {
+                _logger.LogError($"Images request for film {filmId} failed: {e.Message}");
+                return new FilmImagesResponse();
+            }
+        }
+
+        private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web);
     }
 }

@@ -42,6 +42,12 @@ namespace KinopoiskUnofficialInfo.ApiClient
         public Task<FilmSearchResponse> SearchByKeyword(string keyword, int page = 1, CancellationToken? cancellationToken = null)
             => TryGetValue(GenerateKey(nameof(SearchByKeyword), keyword, page), c => c.SearchByKeyword(keyword, page, cancellationToken));
 
+        public Task<SeasonResponse> GetSeasons(int filmId, CancellationToken? cancellationToken = null)
+            => TryGetValue(GenerateKey(nameof(GetSeasons), filmId), c => c.GetSeasons(filmId, cancellationToken));
+
+        public Task<FilmImagesResponse> GetImages(int filmId, CancellationToken? cancellationToken = null)
+            => TryGetValue(GenerateKey(nameof(GetImages), filmId), c => c.GetImages(filmId, cancellationToken));
+
         private static string GenerateKey(params object[] objects)
         {
             var key = string.Empty;
