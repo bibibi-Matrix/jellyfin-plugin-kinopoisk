@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\KinopoiskUnofficialInfo.ApiClient\KinopoiskUnofficialInfo.ApiClient.csproj" />
+    <ProjectReference Include="..\KinopoiskDevAdapter\KinopoiskDevAdapter.csproj" />
   </ItemGroup>
 
 

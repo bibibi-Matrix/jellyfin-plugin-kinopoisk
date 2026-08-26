@@ -9,11 +9,27 @@
         <div data-role="content">
             <div class="content-primary">
                 <form id="KinopoiskConfigForm">
-                    <div class="inputContainer">
-                        <label class="inputeLabel inputLabelUnfocused" for="ApiToken">ApiToken</label>
+                    <div class="selectContainer">
+                        <label class="selectLabel" for="Backend">Алгоритм доступа к КиноПоиску</label>
+                        <select id="Backend" name="Backend" is="emby-select" class="emby-select-withcolor emby-select">
+                            <option value="KinopoiskApiUnofficial">KinopoiskAPI Unofficial (kinopoiskapiunofficial.tech)</option>
+                            <option value="KinopoiskDev">KinopoiskDev (kinopoisk.dev)</option>
+                        </select>
+                        <div class="fieldDescription">Алгоритм сбора информации. Применяется после перезапуска сервера.</div>
+                    </div>
+                    <div class="inputContainer" id="rowUnofficialToken">
+                        <label class="inputeLabel inputLabelUnfocused" for="ApiToken">ApiToken (kinopoiskapiunofficial.tech)</label>
                         <input id="ApiToken" name="ApiToken" type="text" is="emby-input" />
-                        <div class="fieldDescription">Personal api token, you can get your own on
-                            <a href="https://kinopoiskapiunofficial.tech">https://kinopoiskapiunofficial.tech</a>
+                        <div class="fieldDescription">Персональный токен, получите свой на
+                            <a href="https://kinopoiskapiunofficial.tech">https://kinopoiskapiunofficial.tech</a>.
+                            По умолчанию прописан общий, лимит ~10 запросов/сек на всех.
+                        </div>
+                    </div>
+                    <div class="inputContainer" id="rowDevToken">
+                        <label class="inputeLabel inputLabelUnfocused" for="ApiDevToken">Токен (kinopoisk.dev)</label>
+                        <input id="ApiDevToken" name="ApiDevToken" type="text" is="emby-input" />
+                        <div class="fieldDescription">Бесплатный токен с более полной базой изображений и данных:
+                            <a href="https://kinopoisk.dev">https://kinopoisk.dev</a> → профиль → API-ключ.
                         </div>
                     </div>
                     <div>
@@ -29,18 +45,33 @@
                 pluginUniqueId: '33e6d249-648f-44cd-a9ce-497be06c08df'
             };
 
+            function kinopoistToggleTokenRows(backend) {
+                var isDev = backend === 'KinopoiskDev';
+                document.getElementById('rowUnofficialToken').style.display = isDev ? 'none' : '';
+                document.getElementById('rowDevToken').style.display = isDev ? '' : 'none';
+            }
+
             $('#KinopoiskConfigPage').on('pageshow', function () {
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(KinopoiskPluginConfig.pluginUniqueId).then(function (config) {
+                    $('#Backend').val(config.Backend || 'KinopoiskApiUnofficial').change();
                     $('#ApiToken').val(config.ApiToken).change();
+                    $('#ApiDevToken').val(config.ApiDevToken || '').change();
+                    kinopoistToggleTokenRows($('#Backend').val());
                     Dashboard.hideLoadingMsg();
                 });
+            });
+
+            $('#Backend').on('change', function () {
+                kinopoistToggleTokenRows($(this).val());
             });
 
             $('#KinopoiskConfigForm').on('submit', function () {
                 Dashboard.showLoadingMsg();
                 ApiClient.getPluginConfiguration(KinopoiskPluginConfig.pluginUniqueId).then(function (config) {
+                    config.Backend = $('#Backend').val();
                     config.ApiToken = $('#ApiToken').val();
+                    config.ApiDevToken = $('#ApiDevToken').val();
                     ApiClient.updatePluginConfiguration(KinopoiskPluginConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
                     });
