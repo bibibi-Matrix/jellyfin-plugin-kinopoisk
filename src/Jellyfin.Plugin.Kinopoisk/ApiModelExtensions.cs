@@ -156,6 +156,19 @@ namespace Jellyfin.Plugin.Kinopoisk
                     ProviderName = Constants.ProviderName
                 };
                 res = res.Concat(Enumerable.Repeat(mainPoster, 1));
+
+                // Fallback candidate in case the main url fails to download
+                if (!string.IsNullOrWhiteSpace(src.PosterUrlPreview)
+                    && !string.Equals(src.PosterUrlPreview, src.PosterUrl, StringComparison.OrdinalIgnoreCase))
+                {
+                    var previewPoster = new RemoteImageInfo(){
+                        Type = ImageType.Primary,
+                        Url = src.PosterUrlPreview,
+                        Language = Constants.ProviderMetadataLanguage,
+                        ProviderName = Constants.ProviderName
+                    };
+                    res = res.Concat(Enumerable.Repeat(previewPoster, 1));
+                }
             }
 
             // if (src.Images != null)

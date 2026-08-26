@@ -37,7 +37,16 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
             if (!resolveResult)
                 return Enumerable.Empty<RemoteImageInfo>();
 
-            var person = await _apiClient.GetPerson(kinopoiskId, cancellationToken);
+            PersonResponse person;
+            try
+            {
+                person = await _apiClient.GetPerson(kinopoiskId, cancellationToken);
+            }
+            catch (System.Exception e)
+            {
+                _logger.LogWarning(e, "Failed to fetch person {KinopoiskId} for image providers", kinopoiskId);
+                return Enumerable.Empty<RemoteImageInfo>();
+            }
 
             var res = new[] { person.ToRemoteImageInfo() };
             return await FilterEmptyImages(res);

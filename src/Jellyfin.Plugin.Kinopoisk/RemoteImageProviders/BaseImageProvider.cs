@@ -34,9 +34,16 @@ namespace Jellyfin.Plugin.Kinopoisk.MetadataProviders
 
         public abstract IEnumerable<ImageType> GetSupportedImages(BaseItem item);
 
+        internal static HttpClient CreateNoRedirectHttpClient()
+        {
+            var httpClient = new HttpClient(new System.Net.Http.HttpClientHandler { AllowAutoRedirect = false }, true);
+            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (compatible; Jellyfin-Kinopoisk-Plugin)");
+            return httpClient;
+        }
+
         protected async Task<IEnumerable<RemoteImageInfo>> FilterEmptyImages(IEnumerable<RemoteImageInfo> images)
         {
-            using var httpClient = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = false }, true);
+            using var httpClient = CreateNoRedirectHttpClient();
             var sanitizer = new RemoteImageUrlSanitizer(httpClient);
             var res = await Task.WhenAll(images.Select(async i => {
                 var sanitizedUrl = await sanitizer.SanitizeRemoteImageUrl(i.Url);
