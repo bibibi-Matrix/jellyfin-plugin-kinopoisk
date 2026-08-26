@@ -1,19 +1,21 @@
-﻿{
-    "category":  "Metadata",
-    "guid":  "33e6d249-648f-44cd-a9ce-497be06c08df",
-    "name":  "РљРёРЅРѕРџРѕРёСЃРє",
-    "overview":  "РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С„РёР»СЊРјР°С… Рё СЃРµСЂРёР°Р»Р°С… СЃ РљРёРЅРѕРџРѕРёСЃРєР°",
-    "owner":  "bibibi-Matrix",
-    "description":  "Р—Р°РіСЂСѓР¶Р°РµС‚ СЂРµР№С‚РёРЅРі, РѕРїРёСЃР°РЅРёСЏ, Р°РєС‚С‘СЂРѕРІ, С‚СЂРµР№Р»РµСЂС‹ Рё С‚.Рґ. СЃ СЃР°Р№С‚Р° РљРёРЅРѕРџРѕРёСЃРє. РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ РґРІР° Р°Р»РіРѕСЂРёС‚РјР° РґРѕСЃС‚СѓРїР°: kinopoiskapiunofficial.tech (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ) Рё kinopoisk.dev. РњРѕР¶РµС‚ РїРѕС‚СЂРµР±РѕРІР°С‚СЊСЃСЏ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ СЃРІРѕР№ ApiToken, СЃРј. РёРЅС„РѕСЂРјР°С†РёСЋ РІ РїР°СЂР°РјРµС‚СЂР°С… РїР»Р°РіРёРЅР°. Р”Р»СЏ С‚РѕС‡РЅРѕРіРѕ СЂР°СЃРїРѕР·РЅР°РІР°РЅРёСЏ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ СѓРєР°Р·С‹РІР°С‚СЊ id С„РёР»СЊРјР° СЃ СЃР°Р№С‚Р° РљРёРЅРѕРџРѕРёСЃРє РІ РёРјРµРЅРё С„Р°Р№Р»Р° РІ С„РѕСЂРјР°С‚Рµ kp-12345 РёР»Рё kp12345. РџРѕРґСЂРѕР±РЅРµРµ СЃРј. https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/blob/master/README.md\n",
-    "imageUrl":  "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
-    "versions":  [
-                     {
-                         "version":  "10.11.11.9",
-                         "checksum":  "a90be1230ec839e9b13ccfcc5bc3d023",
-                         "changelog":  "- Р”РѕР±Р°РІР»РµРЅ SeasonMetadataProvider вЂ” РѕРїРёСЃР°РЅРёРµ Рё РЅР°Р·РІР°РЅРёРµ СЃРµР·РѕРЅР° РѕС‚ РљРёРЅРѕРџРѕРёСЃРєР°\n- Р”РѕР±Р°РІР»РµРЅ РїРѕСЃС‚РµСЂ СЃРµР·РѕРЅР° (С„РѕР»Р»Р±СЌРє РЅР° РїРѕСЃС‚РµСЂ СЃРµСЂРёР°Р»Р°)\n- РљРёРЅРѕРџРѕРёСЃРє РґРѕР±Р°РІР»РµРЅ РІ Season TypeOptions (MetadataFetchers + ImageFetchers)",
-                         "targetAbi":  "10.11",
-                         "sourceUrl":  "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.9/jellyfin-plugin-kinopoisk_10.11.11.9.zip",
-                         "timestamp":  "2026-08-26T14:38:01Z"
-                     }
-                 ]
-}
+[
+  {
+    "category": "Metadata",
+    "guid": "33e6d249-648f-44cd-a9ce-497be06c08df",
+    "name": "КиноПоиск",
+    "overview": "Информация о фильмах и сериалах с КиноПоиска",
+    "owner": "bibibi-Matrix",
+    "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск. Поддерживаются два алгоритма доступа: kinopoiskapiunofficial.tech (по умолчанию) и kinopoisk.dev. Может потребоваться зарегистрировать свой ApiToken, см. информацию в параметрах плагина. Для точного распознавания рекомендуется указывать id фильма с сайта КиноПоиск в имени файла в формате kp-12345 или kp12345.",
+    "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
+    "versions": [
+      {
+        "version": "10.11.11.9",
+        "checksum": "a90be1230ec839e9b13ccfcc5bc3d023",
+        "changelog": "SeasonMetadataProvider - описание и название сезона от КиноПоиска\nПостер сезона (фоллбэк на постер сериала)\nКиноПоиск добавлен в Season TypeOptions",
+        "targetAbi": "10.11.0",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.9/jellyfin-plugin-kinopoisk_10.11.11.9.zip",
+        "timestamp": "2026-08-26T14:38:01Z"
+      }
+    ]
+  }
+]
