@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## [12.0.0.0]
+
+- Port to Jellyfin 12.0 (SDK 12.0.0, .NET 10, net10.0)
+- Update Jellyfin.Data/Controller/Common/Model, Microsoft.Extensions.* to 12.0.0 / 10.0.11
+- Update CI workflows, manifest targetAbi to 12.0.0.0
+
 ## [10.11.11.4]
 
 - Fix NullReferenceException in RegisterServices (Plugin.Instance not yet available at DI time)
