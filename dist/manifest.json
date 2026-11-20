@@ -1,37 +1,45 @@
 [
-    {
-        "category": "Metadata",
-        "guid": "33e6d249-648f-44cd-a9ce-497be06c08df",
-        "name": "КиноПоиск",
-        "overview": "Информация о фильмах и сериалах с КиноПоиска",
-        "owner": "bibibi-Matrix",
-        "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск.",
-        "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
-        "versions": [
-            {
-                "version": "12.1.0.0",
-                "changelog": "Port to Jellyfin 12.1 (SDK 12.1.0, .NET 10, net10.0)",
-                "targetAbi": "12.1.0.0",
-                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v12.1.0.0/jellyfin-plugin-kinopoisk_12.1.0.0.zip",
-                "checksum": "832910ef2ac3df4e50674e9bb434c169",
-                "timestamp": "2026-09-18T00:00:00Z"
-            },
-            {
-                "version": "12.0.0.0",
-                "changelog": "Port to Jellyfin 12.0 (SDK 12.0.0, .NET 10, net10.0)",
-                "targetAbi": "12.0.0.0",
-                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v12.0.0.0/jellyfin-plugin-kinopoisk_12.0.0.0.zip",
-                "checksum": "b8dd299feef1fc963d637f780b4d6c6b",
-                "timestamp": "2026-09-13T00:00:00Z"
-            },
-            {
-                "version": "10.11.11.4",
-                "changelog": "Fix NullReferenceException in RegisterServices, log backend swap errors, remove redundant lock, fix typo",
-                "targetAbi": "10.11.0.0",
-                "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.4/jellyfin-plugin-kinopoisk_10.11.11.4.zip",
-                "checksum": "9a6d4bff579e5ee349e4ef89629a5c98",
-                "timestamp": "2026-08-26T21:30:00Z"
-            }
-        ]
-    }
+  {
+    "category": "Metadata",
+    "guid": "33e6d249-648f-44cd-a9ce-497be06c08df",
+    "name": "КиноПоиск",
+    "overview": "Информация о фильмах и сериалах с КиноПоиска",
+    "owner": "bibibi-Matrix",
+    "description": "Загружает рейтинги, описания, актёров, трейлеры и т.д. с сайта КиноПоиск.",
+    "imageUrl": "https://kinopoisk.userecho.com/s/attachments/28876/0/1/25f8c0315e6ccb2aa6c2642e48f2c9e9.png",
+    "versions": [
+      {
+        "version": "12.1.0.1",
+        "checksum": "c8582b1387cec367234def3f543aa626",
+        "changelog": "- Fix: saved backend (KinopoiskDev) is now applied on every server start; it no longer silently reverts to KinopoiskApiUnofficial after restart\n- Read plugin configuration when the API client is resolved instead of at DI registration time (Plugin.Instance is not set yet at that point)\n- Add  hosted service that applies the saved backend once the plugin instance is available\n- Avoids the external kp-backend-fix sidecar (re-saving settings through the API after each restart)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v12.1.0.1/jellyfin-plugin-kinopoisk_12.1.0.1.zip",
+        "timestamp": "2026-11-20T16:46:09Z"
+      },
+      {
+        "version": "12.1.0.0",
+        "changelog": "Port to Jellyfin 12.1 (SDK 12.1.0, .NET 10, net10.0)",
+        "targetAbi": "12.1.0.0",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v12.1.0.0/jellyfin-plugin-kinopoisk_12.1.0.0.zip",
+        "checksum": "832910ef2ac3df4e50674e9bb434c169",
+        "timestamp": "2026-09-18T00:00:00Z"
+      },
+      {
+        "version": "12.0.0.0",
+        "changelog": "Port to Jellyfin 12.0 (SDK 12.0.0, .NET 10, net10.0)",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v12.0.0.0/jellyfin-plugin-kinopoisk_12.0.0.0.zip",
+        "checksum": "b8dd299feef1fc963d637f780b4d6c6b",
+        "timestamp": "2026-09-13T00:00:00Z"
+      },
+      {
+        "version": "10.11.11.4",
+        "changelog": "Fix NullReferenceException in RegisterServices, log backend swap errors, remove redundant lock, fix typo",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/bibibi-Matrix/jellyfin-plugin-kinopoisk/releases/download/v10.11.11.4/jellyfin-plugin-kinopoisk_10.11.11.4.zip",
+        "checksum": "9a6d4bff579e5ee349e4ef89629a5c98",
+        "timestamp": "2026-08-26T21:30:00Z"
+      }
+    ]
+  }
 ]
