@@ -99,6 +99,7 @@ jobs:
 
     - name: Package release archive
       run: |
+        mkdir -p ${DIST_ARCHIVES_PATH}
         RELEASE_FILENAME=jellyfin-plugin-kinopoisk_${VERSION}.zip
         RELEASE_FILE=${DIST_ARCHIVES_PATH}/${RELEASE_FILENAME}
         zip --junk-paths $RELEASE_FILE \
