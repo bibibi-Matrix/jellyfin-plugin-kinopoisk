@@ -25,24 +25,53 @@ namespace Jellyfin.Plugin.Kinopoisk
         public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
         {
             ApplicationHost = applicationHost;
-            var configuration = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
 
             serviceCollection.AddSingleton<SwitchableKinopoiskClient>((sp) =>
             {
-                var inner = new CachedKinopoiskApiClient(
-                    CreateRawClient(sp, configuration),
-                    sp.GetRequiredService<IMemoryCache>(),
-                    sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>());
-                var sw = new SwitchableKinopoiskClient(inner, sp.GetRequiredService<ILogger<SwitchableKinopoiskClient>>());
+                // Read the configuration when the client is actually resolved instead of
+                // capturing it here: Plugin.Instance is still null while RegisterServices
+                // runs, so a captured value would always be the default configuration.
+                var configuration = Plugin.Instance?.Configuration ?? new Configuration.PluginConfiguration();
+                var sw = new SwitchableKinopoiskClient(
+                    CreateCachedClient(sp, configuration),
+                    sp.GetRequiredService<ILogger<SwitchableKinopoiskClient>>());
                 SwitchableClient = sw;
                 return sw;
             });
             serviceCollection.AddSingleton<IKinopoiskApiClient>(sp => sp.GetRequiredService<SwitchableKinopoiskClient>());
 
+            serviceCollection.AddHostedService<KinopoiskBackendInitializer>();
+
             serviceCollection.AddSingleton<IProviderIdResolver<MovieInfo>, VideoResolver<MovieInfo>>();
             serviceCollection.AddSingleton<IProviderIdResolver<SeriesInfo>, VideoResolver<SeriesInfo>>();
             serviceCollection.AddSingleton<IProviderIdResolver<PersonLookupInfo>, CommonResolver<PersonLookupInfo>>();
             serviceCollection.AddSingleton<IProviderIdResolver<BaseItem>, CommonResolver<BaseItem>>();
+        }
+
+        internal static CachedKinopoiskApiClient CreateCachedClient(IServiceProvider sp, Configuration.PluginConfiguration configuration)
+        {
+            return new CachedKinopoiskApiClient(
+                CreateRawClient(sp, configuration),
+                sp.GetRequiredService<IMemoryCache>(),
+                sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>());
+        }
+
+        /// <summary>
+        /// Rebuilds the API client from the given configuration and swaps it into the
+        /// running <see cref="SwitchableKinopoiskClient"/>. Returns false when the
+        /// client has not been created yet (the factory will pick up the saved
+        /// configuration on first resolution).
+        /// </summary>
+        internal static bool ApplyConfiguration(IServiceProvider sp, Configuration.PluginConfiguration configuration)
+        {
+            var sw = SwitchableClient;
+            if (sw == null || sp == null || configuration == null)
+            {
+                return false;
+            }
+
+            sw.SwitchTo(CreateCachedClient(sp, configuration));
+            return true;
         }
 
         public static IKinopoiskApiClient CreateRawClient(IServiceProvider sp, Configuration.PluginConfiguration configuration)

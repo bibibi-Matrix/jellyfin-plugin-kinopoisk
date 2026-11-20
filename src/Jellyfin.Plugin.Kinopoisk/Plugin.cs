@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using Jellyfin.Plugin.Kinopoisk.Configuration;
-using KinopoiskUnofficialInfo.ApiClient;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.Kinopoisk
 {
@@ -48,27 +44,19 @@ namespace Jellyfin.Plugin.Kinopoisk
 
         private void SwapBackendIfNeeded(PluginConfiguration configuration)
         {
-            var sw = KinopoiskPluginServiceRegistrator.SwitchableClient;
-            var appHost = KinopoiskPluginServiceRegistrator.ApplicationHost;
-            if (sw == null || appHost?.ServiceProvider == null)
+            var serviceProvider = KinopoiskPluginServiceRegistrator.ApplicationHost?.ServiceProvider;
+            if (serviceProvider == null)
             {
                 return;
             }
 
             try
             {
-                var sp = appHost.ServiceProvider;
-                var newRawClient = KinopoiskPluginServiceRegistrator.CreateRawClient(sp, configuration);
-                var newInner = new CachedKinopoiskApiClient(
-                    newRawClient,
-                    sp.GetRequiredService<IMemoryCache>(),
-                    sp.GetRequiredService<ILogger<CachedKinopoiskApiClient>>());
-
-                sw.SwitchTo(newInner);
+                KinopoiskPluginServiceRegistrator.ApplyConfiguration(serviceProvider, configuration);
             }
             catch (Exception ex)
             {
-                // Log but don't crash — old client continues to work
+                // Log but don't crash — the old client continues to work
                 System.Diagnostics.Debug.WriteLine($"[Kinopoisk] Failed to swap backend: {ex.Message}");
             }
         }

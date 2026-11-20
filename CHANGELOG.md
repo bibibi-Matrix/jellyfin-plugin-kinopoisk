@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## [12.1.0.1]
+
+- Fix: saved backend (KinopoiskDev) is now applied on every server start; it no longer silently reverts to KinopoiskApiUnofficial after restart
+- Read plugin configuration when the API client is resolved instead of at DI registration time (Plugin.Instance is not set yet at that point)
+- Add `KinopoiskBackendInitializer` hosted service that applies the saved backend once the plugin instance is available
+- Avoids the external kp-backend-fix sidecar (re-saving settings through the API after each restart)
+
 ## [12.0.0.0]
 
 - Port to Jellyfin 12.0 (SDK 12.0.0, .NET 10, net10.0)
